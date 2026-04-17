@@ -1,5 +1,6 @@
 pub mod api;
 pub mod config;
+pub mod group;
 pub mod me;
 pub mod project;
 pub mod version;

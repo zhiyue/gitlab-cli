@@ -27,6 +27,10 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::project::ProjectCmd,
     },
+    Group {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::group::GroupCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -53,6 +57,7 @@ fn main() -> std::process::ExitCode {
                     Command::Config { .. } => unreachable!(),
                     Command::Api(args) => gitlab_cli::cmd::api::run(ctx, args).await,
                     Command::Project { cmd } => gitlab_cli::cmd::project::run(ctx, cmd).await,
+                    Command::Group { cmd } => gitlab_cli::cmd::group::run(ctx, cmd).await,
                 }
             })
         }

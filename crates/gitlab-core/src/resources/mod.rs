@@ -1,3 +1,4 @@
+pub mod groups;
 pub mod projects;
 
 /// Percent-encode a project identifier (numeric id or path-with-namespace).
