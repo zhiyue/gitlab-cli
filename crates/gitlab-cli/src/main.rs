@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 
 mod globals;
+mod output;
 
 use globals::GlobalArgs;
 
