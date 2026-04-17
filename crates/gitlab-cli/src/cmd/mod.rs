@@ -1,6 +1,7 @@
 pub mod api;
 pub mod config;
 pub mod group;
+pub mod issue;
 pub mod me;
 pub mod mr;
 pub mod project;

@@ -1,4 +1,5 @@
 pub mod groups;
+pub mod issues;
 pub mod merge_requests;
 pub mod projects;
 
