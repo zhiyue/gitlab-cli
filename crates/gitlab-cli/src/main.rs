@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 
+mod errout;
 mod globals;
 mod output;
 
