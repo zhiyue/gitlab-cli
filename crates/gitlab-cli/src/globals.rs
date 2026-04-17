@@ -1,5 +1,13 @@
 use clap::Args;
 
+fn parse_bool_loose(s: &str) -> Result<bool, String> {
+    match s.to_lowercase().as_str() {
+        "1" | "true" | "yes" | "on" => Ok(true),
+        "0" | "false" | "no" | "off" => Ok(false),
+        _ => Err(format!("invalid boolean value: {s}")),
+    }
+}
+
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Args, Debug, Clone)]
 pub struct GlobalArgs {
@@ -33,7 +41,7 @@ pub struct GlobalArgs {
     #[arg(long, global = true)]
     pub dry_run: bool,
 
-    #[arg(long = "yes", short = 'y', global = true, env = "GITLAB_ASSUME_YES")]
+    #[arg(long = "yes", short = 'y', global = true, env = "GITLAB_ASSUME_YES", value_parser = parse_bool_loose)]
     pub assume_yes: bool,
 
     #[arg(long, global = true, env = "GITLAB_VERBOSE")]
