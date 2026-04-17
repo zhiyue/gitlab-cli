@@ -9,6 +9,10 @@ license.workspace = true
 name = "gitlab"
 path = "src/main.rs"
 
+[lib]
+name = "gitlab_cli"
+path = "src/lib.rs"
+
 [lints]
 workspace = true
 
