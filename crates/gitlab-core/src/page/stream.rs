@@ -1,11 +1,12 @@
 use async_stream::try_stream;
 use futures::Stream;
-use reqwest::header::HeaderMap;
+use reqwest::Method;
 use serde::de::DeserializeOwned;
 
 use crate::client::Client;
 use crate::error::{GitlabError, Result};
 use crate::page::link::{parse_link_header, Rel};
+use crate::request::RequestSpec;
 
 #[derive(Debug, Clone)]
 pub struct PageRequest {
@@ -29,59 +30,45 @@ impl PageRequest {
 }
 
 pub struct PagedStream<T> {
-    _marker: std::marker::PhantomData<T>,
+    _m: std::marker::PhantomData<T>,
 }
 
 impl<T: DeserializeOwned + Send + 'static> PagedStream<T> {
+    #[allow(clippy::while_let_loop, clippy::option_if_let_else, clippy::manual_let_else)]
     pub fn start(client: &Client, req: PageRequest) -> impl Stream<Item = Result<T>> + Unpin {
         let client = client.clone();
         let stream = try_stream! {
-            let mut url = client.endpoint(&req.path)?;
-            {
-                let mut q = url.query_pairs_mut();
-                q.append_pair("per_page", &req.per_page.to_string());
-                q.append_pair("page", "1");
-                for (k, v) in &req.query {
-                    q.append_pair(k, v);
-                }
-            }
+            let mut next_path: Option<String> = Some(req.path.clone());
+            let mut first = true;
             loop {
-                let resp = client
-                    .http()
-                    .get(url.clone())
-                    .header("PRIVATE-TOKEN", client.token())
-                    .send()
-                    .await
-                    .map_err(|e| GitlabError::Network(e.to_string()))?;
-                let status = resp.status().as_u16();
-                let headers = resp.headers().clone();
-                let items: Vec<T> = if resp.status().is_success() {
-                    resp
-                        .json()
-                        .await
-                        .map_err(|e| GitlabError::Network(format!("parse: {e}")))?
-                } else {
-                    let msg = resp.text().await.unwrap_or_default();
-                    Err(GitlabError::from_status(status, msg, extract_request_id(&headers)))?
-                };
-                for it in items {
-                    yield it;
+                let path = match next_path.take() { Some(p) => p, None => break };
+                let mut spec = RequestSpec::new(Method::GET, path);
+                if first {
+                    spec = spec.with_query(req.query.iter().map(|(k,v)| (k.clone(), v.clone())));
+                    spec.query.push(("per_page".to_owned(), req.per_page.to_string()));
+                    spec.query.push(("page".to_owned(), "1".to_owned()));
+                    first = false;
                 }
-                let Some(link) = headers.get("link").and_then(|h| h.to_str().ok()) else { break; };
-                let rels = parse_link_header(link)?;
-                let Some(next) = rels.get(&Rel::Next) else { break; };
-                url = url::Url::parse(next)
-                    .map_err(|e| GitlabError::Network(format!("bad next url {next}: {e}")))?;
+                let (_status, headers, bytes) = client.send_raw(spec).await?;
+                let items: Vec<T> = serde_json::from_slice(&bytes)
+                    .map_err(|e| GitlabError::Network(format!("parse: {e}")))?;
+                for it in items { yield it; }
+                let link = headers.get("link").and_then(|h| h.to_str().ok());
+                if let Some(h) = link {
+                    let rels = parse_link_header(h)?;
+                    if let Some(next) = rels.get(&Rel::Next) {
+                        let url = url::Url::parse(next)
+                            .map_err(|e| GitlabError::Network(format!("bad next url {next}: {e}")))?;
+                        let path_qs = format!("{}?{}", url.path(), url.query().unwrap_or(""));
+                        let trimmed = path_qs
+                            .trim_start_matches("/api/v4/")
+                            .trim_start_matches("api/v4/")
+                            .to_owned();
+                        next_path = Some(trimmed);
+                    }
+                }
             }
         };
         Box::pin(stream)
     }
-}
-
-#[allow(clippy::redundant_closure_for_method_calls)]
-fn extract_request_id(headers: &HeaderMap) -> Option<String> {
-    headers
-        .get("x-request-id")
-        .and_then(|h| h.to_str().ok())
-        .map(|s| s.to_owned())
 }
