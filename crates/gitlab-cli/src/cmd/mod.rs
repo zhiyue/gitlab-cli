@@ -10,6 +10,7 @@ pub mod me;
 pub mod mr;
 pub mod pipeline;
 pub mod project;
+pub mod repo;
 pub mod tag;
 pub mod version;
 

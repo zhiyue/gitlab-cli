@@ -7,6 +7,7 @@ pub mod jobs;
 pub mod merge_requests;
 pub mod pipelines;
 pub mod projects;
+pub mod repos;
 pub mod tags;
 
 /// Percent-encode a project identifier (numeric id or path-with-namespace).
