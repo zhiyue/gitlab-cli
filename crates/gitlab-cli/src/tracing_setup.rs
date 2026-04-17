@@ -1,10 +1,11 @@
 use tracing_subscriber::filter::EnvFilter;
 
+#[must_use]
 pub fn filter_for(v: Option<&str>) -> EnvFilter {
     match v {
-        Some("1") | Some("info") | Some("INFO") => EnvFilter::new("info"),
-        Some("debug") | Some("DEBUG") => EnvFilter::new("debug"),
-        Some("trace") | Some("TRACE") => EnvFilter::new("trace"),
+        Some("1" | "info" | "INFO") => EnvFilter::new("info"),
+        Some("debug" | "DEBUG") => EnvFilter::new("debug"),
+        Some("trace" | "TRACE") => EnvFilter::new("trace"),
         _ => EnvFilter::new("warn"),
     }
 }

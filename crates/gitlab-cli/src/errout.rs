@@ -1,6 +1,7 @@
 use gitlab_core::error::GitlabError;
 use std::io::{self, Write};
 
+#[must_use]
 pub fn report_error(err: &GitlabError) -> i32 {
     let payload = err.to_payload();
     let body = serde_json::json!({ "error": payload });

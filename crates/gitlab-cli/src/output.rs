@@ -11,6 +11,7 @@ pub fn emit_object<T: Serialize>(v: &T) -> io::Result<()> {
     Ok(())
 }
 
+#[allow(clippy::cast_possible_truncation)]
 pub async fn emit_stream<T, S>(stream: S, fmt: OutputFormat, limit: Option<u32>) -> io::Result<usize>
 where
     T: Serialize,

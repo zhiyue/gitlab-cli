@@ -1,7 +1,9 @@
+#[allow(unused_imports)]
 use gitlab_cli_test_support::*;
 // We use a small inline support module below.
 
 #[test]
+#[allow(clippy::assertions_on_constants)]
 fn placeholder_until_command_exists() { assert!(true); }
 
 #[test]

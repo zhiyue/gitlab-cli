@@ -54,7 +54,9 @@ fn main() -> std::process::ExitCode {
         Ok(()) => std::process::ExitCode::from(0),
         Err(e) => {
             if let Some(ge) = e.downcast_ref::<gitlab_core::error::GitlabError>() {
-                std::process::ExitCode::from(report_error(ge) as u8)
+                #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+                let code = report_error(ge) as u8;
+                std::process::ExitCode::from(code)
             } else {
                 eprintln!("{{\"error\":{{\"code\":\"unknown\",\"message\":\"{e}\",\"retryable\":false}}}}");
                 std::process::ExitCode::from(1)
@@ -67,6 +69,6 @@ fn read_config_text(globals: &GlobalArgs) -> String {
     let path = globals
         .config
         .clone()
-        .or_else(|| gitlab_core::config::Config::default_config_path());
+        .or_else(gitlab_core::config::Config::default_config_path);
     path.and_then(|p| std::fs::read_to_string(p).ok()).unwrap_or_default()
 }

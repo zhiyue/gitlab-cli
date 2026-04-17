@@ -1,5 +1,6 @@
 use clap::Args;
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Args, Debug, Clone)]
 pub struct GlobalArgs {
     #[arg(long, global = true, env = "GITLAB_HOST")]
