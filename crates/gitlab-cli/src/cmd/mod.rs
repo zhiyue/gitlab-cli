@@ -12,6 +12,7 @@ pub mod pipeline;
 pub mod project;
 pub mod repo;
 pub mod tag;
+pub mod user;
 pub mod version;
 
 pub fn load_json(raw: &str) -> anyhow::Result<serde_json::Value> {

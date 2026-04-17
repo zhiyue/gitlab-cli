@@ -67,6 +67,10 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::repo::RepoCmd,
     },
+    User {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::user::UserCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -103,6 +107,7 @@ fn main() -> std::process::ExitCode {
                     Command::Tag { cmd } => gitlab_cli::cmd::tag::run(ctx, cmd).await,
                     Command::File { cmd } => gitlab_cli::cmd::file::run(ctx, cmd).await,
                     Command::Repo { cmd } => gitlab_cli::cmd::repo::run(ctx, cmd).await,
+                    Command::User { cmd } => gitlab_cli::cmd::user::run(ctx, cmd).await,
                 }
             })
         }

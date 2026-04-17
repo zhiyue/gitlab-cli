@@ -9,6 +9,7 @@ pub mod pipelines;
 pub mod projects;
 pub mod repos;
 pub mod tags;
+pub mod users;
 
 /// Percent-encode a project identifier (numeric id or path-with-namespace).
 #[must_use]
