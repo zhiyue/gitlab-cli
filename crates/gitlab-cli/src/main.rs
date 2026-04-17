@@ -59,6 +59,10 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::tag::TagCmd,
     },
+    File {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::file::FileCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -93,6 +97,7 @@ fn main() -> std::process::ExitCode {
                     Command::Commit { cmd } => gitlab_cli::cmd::commit::run(ctx, cmd).await,
                     Command::Branch { cmd } => gitlab_cli::cmd::branch::run(ctx, cmd).await,
                     Command::Tag { cmd } => gitlab_cli::cmd::tag::run(ctx, cmd).await,
+                    Command::File { cmd } => gitlab_cli::cmd::file::run(ctx, cmd).await,
                 }
             })
         }

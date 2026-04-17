@@ -2,6 +2,7 @@ pub mod api;
 pub mod branch;
 pub mod commit;
 pub mod config;
+pub mod file;
 pub mod group;
 pub mod issue;
 pub mod job;

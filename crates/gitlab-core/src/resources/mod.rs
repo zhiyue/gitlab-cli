@@ -1,5 +1,6 @@
 pub mod branches;
 pub mod commits;
+pub mod files;
 pub mod groups;
 pub mod issues;
 pub mod jobs;
