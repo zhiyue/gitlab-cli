@@ -17,6 +17,10 @@ struct Cli {
 enum Command {
     Version,
     Me,
+    Config {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::config::ConfigCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -24,21 +28,27 @@ fn main() -> std::process::ExitCode {
     tracing_setup::init(cli.globals.verbose.as_deref());
 
     let config_text = read_config_text(&cli.globals);
-    let ctx = match Context::build(CliInputs { globals: cli.globals.clone(), config_text }) {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
-            return std::process::ExitCode::from(2);
+
+    let result: Result<(), anyhow::Error> = match cli.command {
+        Command::Config { cmd } => gitlab_cli::cmd::config::run(cmd, cli.globals.config.clone()),
+        other => {
+            let ctx = match Context::build(CliInputs { globals: cli.globals.clone(), config_text }) {
+                Ok(c) => c,
+                Err(e) => {
+                    eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
+                    return std::process::ExitCode::from(2);
+                }
+            };
+            let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+            rt.block_on(async {
+                match other {
+                    Command::Version => gitlab_cli::cmd::version::run(ctx).await,
+                    Command::Me => gitlab_cli::cmd::me::run(ctx).await,
+                    Command::Config { .. } => unreachable!(),
+                }
+            })
         }
     };
-
-    let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
-    let result = rt.block_on(async {
-        match cli.command {
-            Command::Version => gitlab_cli::cmd::version::run(ctx).await,
-            Command::Me => gitlab_cli::cmd::me::run(ctx).await,
-        }
-    });
 
     match result {
         Ok(()) => std::process::ExitCode::from(0),
