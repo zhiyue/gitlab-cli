@@ -1,3 +1,4 @@
+pub mod cmd;
 pub mod context;
 pub mod errout;
 pub mod globals;
