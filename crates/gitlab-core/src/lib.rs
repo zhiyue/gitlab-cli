@@ -6,5 +6,6 @@ pub mod config;
 pub mod error;
 pub mod page;
 pub mod request;
+pub mod resources;
 pub mod retry;
 pub mod throttle;

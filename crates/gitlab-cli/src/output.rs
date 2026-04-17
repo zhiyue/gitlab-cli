@@ -6,7 +6,7 @@ use std::io::{self, Write};
 pub fn emit_object<T: Serialize>(v: &T) -> io::Result<()> {
     let stdout = io::stdout();
     let mut lock = stdout.lock();
-    serde_json::to_writer_pretty(&mut lock, v)?;
+    serde_json::to_writer(&mut lock, v)?;
     lock.write_all(b"\n")?;
     Ok(())
 }

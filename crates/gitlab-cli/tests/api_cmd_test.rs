@@ -27,7 +27,7 @@ async fn api_post_sends_body() {
     let server = MockServer::start().await;
     Mock::given(method("POST"))
         .and(path("/api/v4/projects/1/labels"))
-        .and(body_json(&serde_json::json!({"name":"bug","color":"#FF0000"})))
+        .and(body_json(serde_json::json!({"name":"bug","color":"#FF0000"})))
         .respond_with(
             ResponseTemplate::new(201).set_body_json(serde_json::json!({"id":9,"name":"bug"})),
         )

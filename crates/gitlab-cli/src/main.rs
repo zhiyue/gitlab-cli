@@ -23,6 +23,10 @@ enum Command {
     },
     #[command(name = "api")]
     Api(gitlab_cli::cmd::api::ApiArgs),
+    Project {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::project::ProjectCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -48,6 +52,7 @@ fn main() -> std::process::ExitCode {
                     Command::Me => gitlab_cli::cmd::me::run(ctx).await,
                     Command::Config { .. } => unreachable!(),
                     Command::Api(args) => gitlab_cli::cmd::api::run(ctx, args).await,
+                    Command::Project { cmd } => gitlab_cli::cmd::project::run(ctx, cmd).await,
                 }
             })
         }
