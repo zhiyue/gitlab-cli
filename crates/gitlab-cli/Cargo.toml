@@ -1,0 +1,16 @@
+[package]
+name = "gitlab-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "gitlab"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+gitlab-core = { path = "../gitlab-core" }
