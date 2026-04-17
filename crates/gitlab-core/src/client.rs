@@ -104,6 +104,7 @@ impl Client {
     pub async fn send_raw(&self, spec: RequestSpec) -> Result<(u16, HeaderMap, bytes::Bytes)> {
         let plan_net = self.retry.plan_for_network();
         let mut attempt_429: usize = 0;
+        let mut attempt_net: usize = 0;
 
         loop {
             self.throttle.acquire().await;
@@ -118,7 +119,6 @@ impl Client {
             if let Some(body) = &spec.body {
                 req = req.json(body);
             }
-            let attempt_idx_net = plan_net.attempts.len().saturating_sub(1);
             match req.send().await {
                 Ok(resp) => {
                     let status = resp.status().as_u16();
@@ -150,7 +150,8 @@ impl Client {
                             ));
                         }
                         500..=599 => {
-                            if let Some(d) = plan_net.attempts.get(attempt_idx_net).copied() {
+                            if let Some(d) = plan_net.attempts.get(attempt_net).copied() {
+                                attempt_net += 1;
                                 tokio::time::sleep(d).await;
                                 continue;
                             }
@@ -168,14 +169,16 @@ impl Client {
                     }
                 }
                 Err(e) if e.is_timeout() => {
-                    if let Some(d) = plan_net.attempts.get(attempt_idx_net).copied() {
+                    if let Some(d) = plan_net.attempts.get(attempt_net).copied() {
+                        attempt_net += 1;
                         tokio::time::sleep(d).await;
                         continue;
                     }
                     return Err(GitlabError::Timeout(e.to_string()));
                 }
                 Err(e) if e.is_connect() => {
-                    if let Some(d) = plan_net.attempts.get(attempt_idx_net).copied() {
+                    if let Some(d) = plan_net.attempts.get(attempt_net).copied() {
+                        attempt_net += 1;
                         tokio::time::sleep(d).await;
                         continue;
                     }
