@@ -6,3 +6,4 @@ pub mod config;
 pub mod error;
 pub mod page;
 pub mod retry;
+pub mod throttle;
