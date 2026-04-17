@@ -1,10 +1,15 @@
 pub mod api;
+pub mod branch;
+pub mod commit;
 pub mod config;
 pub mod group;
 pub mod issue;
+pub mod job;
 pub mod me;
 pub mod mr;
+pub mod pipeline;
 pub mod project;
+pub mod tag;
 pub mod version;
 
 pub fn load_json(raw: &str) -> anyhow::Result<serde_json::Value> {

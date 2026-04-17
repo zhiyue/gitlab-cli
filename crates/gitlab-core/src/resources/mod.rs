@@ -1,7 +1,12 @@
+pub mod branches;
+pub mod commits;
 pub mod groups;
 pub mod issues;
+pub mod jobs;
 pub mod merge_requests;
+pub mod pipelines;
 pub mod projects;
+pub mod tags;
 
 /// Percent-encode a project identifier (numeric id or path-with-namespace).
 #[must_use]

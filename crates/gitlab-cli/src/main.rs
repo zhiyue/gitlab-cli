@@ -39,6 +39,26 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::issue::IssueCmd,
     },
+    Pipeline {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::pipeline::PipelineCmd,
+    },
+    Job {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::job::JobCmd,
+    },
+    Commit {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::commit::CommitCmd,
+    },
+    Branch {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::branch::BranchCmd,
+    },
+    Tag {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::tag::TagCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -68,6 +88,11 @@ fn main() -> std::process::ExitCode {
                     Command::Group { cmd } => gitlab_cli::cmd::group::run(ctx, cmd).await,
                     Command::Mr { cmd } => gitlab_cli::cmd::mr::run(ctx, cmd).await,
                     Command::Issue { cmd } => gitlab_cli::cmd::issue::run(ctx, cmd).await,
+                    Command::Pipeline { cmd } => gitlab_cli::cmd::pipeline::run(ctx, cmd).await,
+                    Command::Job { cmd } => gitlab_cli::cmd::job::run(ctx, cmd).await,
+                    Command::Commit { cmd } => gitlab_cli::cmd::commit::run(ctx, cmd).await,
+                    Command::Branch { cmd } => gitlab_cli::cmd::branch::run(ctx, cmd).await,
+                    Command::Tag { cmd } => gitlab_cli::cmd::tag::run(ctx, cmd).await,
                 }
             })
         }
