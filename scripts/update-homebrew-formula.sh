@@ -17,7 +17,9 @@ FORMULA="${GITLAB_CLI_FORMULA:-dist/homebrew/gitlab-cli.rb}"
 
 fetch_sha() {
     target="$1"
-    url="https://github.com/${REPO}/releases/download/${TAG}/gitlab-cli-${TAG}-${target}.tar.gz.sha256"
+    # taiki-e/upload-rust-binary-action names the checksum file <archive-stem>.sha256
+    # (NOT <archive-stem>.tar.gz.sha256), so drop the .tar.gz from the URL.
+    url="https://github.com/${REPO}/releases/download/${TAG}/gitlab-cli-${TAG}-${target}.sha256"
     curl -fsSL "$url" | awk '{print $1}'
 }
 
