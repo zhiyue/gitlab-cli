@@ -3,10 +3,38 @@
 An agent-first Rust CLI for **GitLab EE 14.0.5** (not newer, not older).
 Consumed by autonomous agents via `bash -c` + JSON.
 
+## Install
+
+### Homebrew (macOS + Linux)
+
+```bash
+brew install zhiyue/tap/gitlab-cli
+```
+
+### curl | sh (macOS + Linux)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/zhiyue/gitlab-cli/main/install.sh | sh
+# Specific version / install dir:
+#   curl -sSL ... | sh -s -- -v v0.2.0 -d ~/.local/bin
+```
+
+### PowerShell (Windows)
+
+```powershell
+irm https://raw.githubusercontent.com/zhiyue/gitlab-cli/main/install.ps1 | iex
+```
+
+### From source (Rust toolchain)
+
+```bash
+cargo install --git https://github.com/zhiyue/gitlab-cli --locked
+```
+
 ## Quick start
 
 ```bash
-gitlab config set-token --host gitlab.example.com --token glpat-XXXX
+gitlab config set-token --host https://gitlab.example.com --token glpat-XXXX
 gitlab version
 gitlab mr list --project atoms/api --state opened | jq '.[].iid'
 ```
@@ -17,7 +45,7 @@ gitlab mr list --project atoms/api --state opened | jq '.[].iid'
 |---|---|
 | `project` | list, get, create, update, delete, fork, archive, unarchive |
 | `group` | list, get, create, update, delete, members, projects, subgroups |
-| `mr` | list, get, create, update, close, reopen, merge, rebase, approve, unapprove, diffs, commits, changes, pipelines |
+| `mr` | list, get, create, update, close, reopen, merge, rebase, approve, unapprove, commits, changes, pipelines |
 | `issue` | list, get, create, update, close, reopen, link, unlink, move, stats |
 | `pipeline` | list, get, create, retry, cancel, delete, variables |
 | `job` | list, get, play, retry, cancel, erase, trace, artifacts |
@@ -66,4 +94,4 @@ Run `gitlab manifest` (and `gitlab manifest <command>`) for a JSON-formatted vie
 
 ## License
 
-MIT.
+Apache-2.0. See [LICENSE](LICENSE).
