@@ -4,8 +4,22 @@ use gitlab_cli::errout::report_error;
 use gitlab_cli::globals::GlobalArgs;
 use gitlab_cli::tracing_setup;
 
+const VERSION_STRING: &str = concat!(
+    env!("CARGO_PKG_VERSION"),
+    " (target=",
+    env!("GITLAB_CLI_TARGET"),
+    ", git=",
+    env!("GITLAB_CLI_GIT_SHA"),
+    ")"
+);
+
 #[derive(Parser)]
-#[command(name = "gitlab", version, about = "gitlab-cli for GitLab 14.0.5-ee", propagate_version = true)]
+#[command(
+    name = "gitlab",
+    version = VERSION_STRING,
+    about = "gitlab-cli for GitLab 14.0.5-ee",
+    propagate_version = true
+)]
 struct Cli {
     #[command(flatten)]
     globals: GlobalArgs,
@@ -96,14 +110,20 @@ fn main() -> std::process::ExitCode {
     let result: Result<(), anyhow::Error> = match cli.command {
         Command::Config { cmd } => gitlab_cli::cmd::config::run(cmd, cli.globals.config.clone()),
         other => {
-            let ctx = match Context::build(CliInputs { globals: cli.globals.clone(), config_text }) {
+            let ctx = match Context::build(CliInputs {
+                globals: cli.globals.clone(),
+                config_text,
+            }) {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
                     return std::process::ExitCode::from(2);
                 }
             };
-            let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+            let rt = tokio::runtime::Builder::new_multi_thread()
+                .enable_all()
+                .build()
+                .unwrap();
             rt.block_on(async {
                 match other {
                     Command::Version => gitlab_cli::cmd::version::run(ctx).await,
@@ -151,5 +171,6 @@ fn read_config_text(globals: &GlobalArgs) -> String {
         .config
         .clone()
         .or_else(gitlab_core::config::Config::default_config_path);
-    path.and_then(|p| std::fs::read_to_string(p).ok()).unwrap_or_default()
+    path.and_then(|p| std::fs::read_to_string(p).ok())
+        .unwrap_or_default()
 }
