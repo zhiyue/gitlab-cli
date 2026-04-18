@@ -1,5 +1,6 @@
 pub mod api;
 pub mod branch;
+pub mod from_url;
 pub mod manifest;
 pub mod commit;
 pub mod config;

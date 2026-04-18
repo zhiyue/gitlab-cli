@@ -100,6 +100,8 @@ enum Command {
     #[command(name = "search")]
     Search(gitlab_cli::cmd::search::SearchArgs),
     Manifest(gitlab_cli::cmd::manifest::ManifestArgs),
+    #[command(name = "from-url")]
+    FromUrl(gitlab_cli::cmd::from_url::FromUrlArgs),
 }
 
 fn main() -> std::process::ExitCode {
@@ -109,14 +111,26 @@ fn main() -> std::process::ExitCode {
     let config_text = read_config_text(&cli.globals);
 
     // Dispatch no-auth commands before Context::build (they don't need a token).
-    if let Command::Manifest(args) = cli.command {
-        return match gitlab_cli::cmd::manifest::run(args) {
-            Ok(()) => std::process::ExitCode::from(0),
-            Err(e) => {
-                eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
-                std::process::ExitCode::from(2)
-            }
-        };
+    match cli.command {
+        Command::Manifest(args) => {
+            return match gitlab_cli::cmd::manifest::run(args) {
+                Ok(()) => std::process::ExitCode::from(0),
+                Err(e) => {
+                    eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
+                    std::process::ExitCode::from(2)
+                }
+            };
+        }
+        Command::FromUrl(args) => {
+            return match gitlab_cli::cmd::from_url::run(&args) {
+                Ok(()) => std::process::ExitCode::from(0),
+                Err(e) => {
+                    eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
+                    std::process::ExitCode::from(2)
+                }
+            };
+        }
+        _ => {}
     }
 
     let result: Result<(), anyhow::Error> = match cli.command {
@@ -158,7 +172,7 @@ fn main() -> std::process::ExitCode {
                     Command::Note { cmd } => gitlab_cli::cmd::note::run(ctx, cmd).await,
                     Command::Discussion { cmd } => gitlab_cli::cmd::discussion::run(ctx, cmd).await,
                     Command::Search(args) => gitlab_cli::cmd::search::run(ctx, args).await,
-                    Command::Manifest(_) => unreachable!("handled before Context::build"),
+                    Command::Manifest(_) | Command::FromUrl(_) => unreachable!("handled before Context::build"),
                 }
             })
         }
