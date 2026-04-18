@@ -52,6 +52,9 @@ pub struct ErrorPayload {
     pub request_id: Option<String>,
     pub retryable: bool,
     pub details: serde_json::Value,
+    /// Human-readable suggestion for fixing this specific error class. Set by the CLI layer.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -139,6 +142,7 @@ impl GitlabError {
                 request_id: request_id.clone(),
                 retryable: code.retryable(),
                 details: details.clone(),
+                hint: None,
             },
             other => ErrorPayload {
                 code: other.code(),
@@ -147,6 +151,7 @@ impl GitlabError {
                 request_id: None,
                 retryable: other.retryable(),
                 details: serde_json::Value::Null,
+                hint: None,
             },
         }
     }

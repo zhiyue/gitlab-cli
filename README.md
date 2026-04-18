@@ -47,6 +47,23 @@ Resolution order: `--token` > `GITLAB_TOKEN` > `~/.config/gitlab-cli/config.toml
 
 This CLI is **frozen against GitLab 14.0.5-ee**. Fields and endpoints differ from 15.x+ — output is passed through unmodified.
 
+## Known GitLab 14.0.5 API quirks
+
+These are server-side behaviors of GitLab 14.0.5-ee that surprise agents. CLI does not paper over them — they're documented here so you know what to expect:
+
+| Area | What happens | Workaround |
+|---|---|---|
+| `mr commits.parent_ids` | Always returns `[]` | Use `gitlab commit get --sha <id>` to fetch full commit including parent_ids |
+| `mr diffs` endpoint | 404 (introduced in 15.7) | Use `gitlab mr changes` (single object with all file diffs) |
+| `/raw_diffs` endpoint | 404 (introduced in 16.4) | Use `gitlab mr changes` and read each file's `.diff` field |
+| Project Access Tokens | Available but CLI doesn't support | Use a user-scoped PAT |
+| `users` endpoint extras | Some fields missing vs newer versions | Use `gitlab api GET /user/...` with explicit field selection if needed |
+| Pagination caps | `per_page` max is 100 | CLI auto-paginates; use `--limit N` to cap |
+| MR `approve` (EE) | 403 if license expired | Approval requires EE license + reviewer PAT |
+| Write confirmation | TTY prompt blocks scripts | Set `GITLAB_ASSUME_YES=1` or `assume_yes=true` per host in config.toml |
+
+Run `gitlab manifest` (and `gitlab manifest <command>`) for a JSON-formatted view of these quirks plus per-command examples — agents should consume that rather than this table.
+
 ## License
 
 MIT.
