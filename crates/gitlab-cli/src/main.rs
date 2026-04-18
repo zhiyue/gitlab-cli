@@ -79,6 +79,10 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::note::NoteCmd,
     },
+    Discussion {
+        #[command(subcommand)]
+        cmd: gitlab_cli::cmd::discussion::DiscussionCmd,
+    },
 }
 
 fn main() -> std::process::ExitCode {
@@ -118,6 +122,7 @@ fn main() -> std::process::ExitCode {
                     Command::User { cmd } => gitlab_cli::cmd::user::run(ctx, cmd).await,
                     Command::Label { cmd } => gitlab_cli::cmd::label::run(ctx, cmd).await,
                     Command::Note { cmd } => gitlab_cli::cmd::note::run(ctx, cmd).await,
+                    Command::Discussion { cmd } => gitlab_cli::cmd::discussion::run(ctx, cmd).await,
                 }
             })
         }
