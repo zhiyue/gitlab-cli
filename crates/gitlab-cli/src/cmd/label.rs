@@ -65,7 +65,7 @@ pub async fn run(ctx: Context, cmd: LabelCmd) -> Result<()> {
             if !confirm_or_skip(ctx.assume_yes, &format!("update label {}", a.id))? {
                 anyhow::bail!("aborted");
             }
-            let v: serde_json::Value = ctx.client.send_json(labels::update(&a.project, a.id, body)).await?;
+            let v: serde_json::Value = ctx.client.send_json(labels::update(&a.project, a.id, &body)).await?;
             emit_object(&v)?;
         }
         LabelCmd::Delete(t) => {

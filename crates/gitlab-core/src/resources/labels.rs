@@ -20,8 +20,8 @@ pub fn create(project: &str, name: &str, color: &str) -> RequestSpec {
 }
 
 #[must_use]
-pub fn update(project: &str, id: u64, body: serde_json::Value) -> RequestSpec {
-    RequestSpec::new(Method::PUT, format!("projects/{}/labels/{id}", encode_id(project))).with_json(&body)
+pub fn update(project: &str, id: u64, body: &serde_json::Value) -> RequestSpec {
+    RequestSpec::new(Method::PUT, format!("projects/{}/labels/{id}", encode_id(project))).with_json(body)
 }
 
 #[must_use]
