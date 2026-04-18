@@ -9,6 +9,7 @@ pub mod job;
 pub mod label;
 pub mod me;
 pub mod mr;
+pub mod note;
 pub mod pipeline;
 pub mod project;
 pub mod repo;

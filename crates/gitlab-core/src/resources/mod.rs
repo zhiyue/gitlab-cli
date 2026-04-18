@@ -6,6 +6,7 @@ pub mod issues;
 pub mod jobs;
 pub mod labels;
 pub mod merge_requests;
+pub mod notes;
 pub mod pipelines;
 pub mod projects;
 pub mod repos;
