@@ -14,6 +14,7 @@ pub mod note;
 pub mod pipeline;
 pub mod project;
 pub mod repo;
+pub mod search;
 pub mod tag;
 pub mod user;
 pub mod version;

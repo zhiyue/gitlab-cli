@@ -83,6 +83,8 @@ enum Command {
         #[command(subcommand)]
         cmd: gitlab_cli::cmd::discussion::DiscussionCmd,
     },
+    #[command(name = "search")]
+    Search(gitlab_cli::cmd::search::SearchArgs),
 }
 
 fn main() -> std::process::ExitCode {
@@ -123,6 +125,7 @@ fn main() -> std::process::ExitCode {
                     Command::Label { cmd } => gitlab_cli::cmd::label::run(ctx, cmd).await,
                     Command::Note { cmd } => gitlab_cli::cmd::note::run(ctx, cmd).await,
                     Command::Discussion { cmd } => gitlab_cli::cmd::discussion::run(ctx, cmd).await,
+                    Command::Search(args) => gitlab_cli::cmd::search::run(ctx, args).await,
                 }
             })
         }

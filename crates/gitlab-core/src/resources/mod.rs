@@ -11,6 +11,7 @@ pub mod notes;
 pub mod pipelines;
 pub mod projects;
 pub mod repos;
+pub mod search;
 pub mod tags;
 pub mod users;
 
