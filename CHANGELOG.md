@@ -2,6 +2,19 @@
 
 All notable changes to `gitlab-cli` documented here. Format follows [Keep a Changelog](https://keepachangelog.com).
 
+## [0.2.1] — 2026-04-18
+
+### Fixed
+
+- `Cargo.toml` workspace version was still `0.1.0`, so `gitlab --version` printed `0.1.0` even on the v0.2.0 release tag. Bumped to track release tags going forward.
+- `scripts/update-homebrew-formula.sh` constructed the wrong URL (`<stem>.tar.gz.sha256` instead of `<stem>.sha256`), causing the `bump-homebrew` job to 404 on every fetch. Fixed.
+- `deny.toml` rejected `Unicode-3.0` (icu_* via url→idna) and `CDLA-Permissive-2.0` (webpki-roots). Both added to allow list.
+- `release.yml` `workflow_dispatch` `tag` input now properly prefixed with `refs/tags/` for `taiki-e/*-action` compatibility.
+
+### Removed
+
+- `x86_64-apple-darwin` (Intel Mac) build dropped from release matrix — `macos-13` runner is being deprecated by GitHub Actions. Intel Mac users: use the curl|sh installer or `cargo install --git ...`.
+
 ## [0.2.0] — 2026-04-18
 
 ### Added
