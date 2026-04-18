@@ -75,6 +75,7 @@ pub struct MergeArgs {
     pub squash: bool,
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn run(ctx: Context, cmd: MrCmd) -> Result<()> {
     match cmd {
         MrCmd::List(a) => {
@@ -101,7 +102,9 @@ pub async fn run(ctx: Context, cmd: MrCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, "create MR")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "create MR")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -117,16 +120,24 @@ pub async fn run(ctx: Context, cmd: MrCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("update MR {}", a.mr))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("update MR {}", a.mr))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
         MrCmd::Close(t) => {
-            let v: serde_json::Value = ctx.client.send_json(mr::close_spec(&t.project, t.mr)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(mr::close_spec(&t.project, t.mr))
+                .await?;
             emit_object(&v)?;
         }
         MrCmd::Reopen(t) => {
-            let v: serde_json::Value = ctx.client.send_json(mr::reopen_spec(&t.project, t.mr)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(mr::reopen_spec(&t.project, t.mr))
+                .await?;
             emit_object(&v)?;
         }
         MrCmd::Merge(a) => {
@@ -140,35 +151,58 @@ pub async fn run(ctx: Context, cmd: MrCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("merge MR {}", a.mr))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("merge MR {}", a.mr))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
         MrCmd::Rebase(t) => {
-            let v: serde_json::Value = ctx.client.send_json(mr::rebase_spec(&t.project, t.mr)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(mr::rebase_spec(&t.project, t.mr))
+                .await?;
             emit_object(&v)?;
         }
         MrCmd::Approve(t) => {
-            let v: serde_json::Value = ctx.client.send_json(mr::approve_spec(&t.project, t.mr)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(mr::approve_spec(&t.project, t.mr))
+                .await?;
             emit_object(&v)?;
         }
         MrCmd::Unapprove(t) => {
-            let _ = ctx.client.send_raw(mr::unapprove_spec(&t.project, t.mr)).await?;
+            let _ = ctx
+                .client
+                .send_raw(mr::unapprove_spec(&t.project, t.mr))
+                .await?;
         }
         MrCmd::Changes(t) => {
-            let v: serde_json::Value = ctx.client.send_json(mr::changes_spec(&t.project, t.mr)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(mr::changes_spec(&t.project, t.mr))
+                .await?;
             emit_object(&v)?;
         }
         MrCmd::Diffs(t) => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, mr::diffs_page(&t.project, t.mr));
+            let stream = PagedStream::<serde_json::Value>::start(
+                &ctx.client,
+                mr::diffs_page(&t.project, t.mr),
+            );
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         MrCmd::Commits(t) => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, mr::commits_page(&t.project, t.mr));
+            let stream = PagedStream::<serde_json::Value>::start(
+                &ctx.client,
+                mr::commits_page(&t.project, t.mr),
+            );
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         MrCmd::Pipelines(t) => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, mr::pipelines_page(&t.project, t.mr));
+            let stream = PagedStream::<serde_json::Value>::start(
+                &ctx.client,
+                mr::pipelines_page(&t.project, t.mr),
+            );
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
     }
