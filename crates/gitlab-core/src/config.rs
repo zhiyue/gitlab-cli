@@ -51,7 +51,17 @@ impl Config {
 
     #[must_use]
     pub fn default_config_path() -> Option<PathBuf> {
-        directories::ProjectDirs::from("", "", "gitlab-cli")
-            .map(|p| p.config_dir().join("config.toml"))
+        #[cfg(windows)]
+        {
+            std::env::var_os("APPDATA")
+                .map(|p| PathBuf::from(p).join("gitlab-cli").join("config.toml"))
+        }
+        #[cfg(not(windows))]
+        {
+            let base = std::env::var_os("XDG_CONFIG_HOME")
+                .map(PathBuf::from)
+                .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?;
+            Some(base.join("gitlab-cli").join("config.toml"))
+        }
     }
 }
