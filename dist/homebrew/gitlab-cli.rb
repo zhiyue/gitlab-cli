@@ -7,24 +7,24 @@ class GitlabCli < Formula
   desc "Agent-first CLI for legacy GitLab EE 14.0.5"
   homepage "https://github.com/zhiyue/gitlab-cli"
   license "Apache-2.0"
-  version "0.2.0"
+  version "0.2.1"
 
   # Intel Mac (x86_64-apple-darwin) build is not published; arm64 only.
   # Intel Mac users can install via the curl|sh installer or build from source.
   depends_on arch: :arm64
 
   on_macos do
-    url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.0/gitlab-cli-v0.2.0-aarch64-apple-darwin.tar.gz"
-    sha256 "879c06c7bb3a8b2c61fe126cd773d5e39988a2ce30af48e5030328bbbd1a0254"
+    url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.1/gitlab-cli-v0.2.1-aarch64-apple-darwin.tar.gz"
+    sha256 "e63c39539d9fc0de69d5c6f9d3a539303be66603e47339e726ece7f590d75b2a"
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.0/gitlab-cli-v0.2.0-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "beed9ee9360503fcf3fba3e4e74a07fc66ad5781599db753577dc68b750a4035"
+      url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.1/gitlab-cli-v0.2.1-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "cf4feb43b22c9a655d61f9b6de14853441fa4cd45e0d246f09e882892046034a"
     else
-      url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.0/gitlab-cli-v0.2.0-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "30bfcacc441be73b3669f59cfc67ee9026c9c8a1ba38854ba3ec4e299228aa60"
+      url "https://github.com/zhiyue/gitlab-cli/releases/download/v0.2.1/gitlab-cli-v0.2.1-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "93586d184d94d771a8b0e2abeb185b84cf2729406b9abc34cb01b6c9c1cbaac3"
     end
   end
 
