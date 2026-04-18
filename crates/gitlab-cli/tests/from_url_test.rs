@@ -3,24 +3,37 @@ use serde_json::Value;
 
 fn cmd() -> Command {
     let mut c = Command::cargo_bin("gitlab").unwrap();
-    c.env("GITLAB_HOST", "https://example.com").env("GITLAB_TOKEN", "glpat-x");
+    c.env("GITLAB_HOST", "https://example.com")
+        .env("GITLAB_TOKEN", "glpat-x");
     c
 }
 
 #[test]
 fn from_url_mr() {
-    let out = cmd().args(["from-url", "https://gitlab.deepwisdomai.com/group/sub/proj/-/merge_requests/123"]).output().unwrap();
+    let out = cmd()
+        .args([
+            "from-url",
+            "https://gitlab.deepwisdomai.com/group/sub/proj/-/merge_requests/123",
+        ])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "mr");
     assert_eq!(v["project"], "group/sub/proj");
     assert_eq!(v["mr"], 123);
-    assert!(v["host"].as_str().unwrap().contains("gitlab.deepwisdomai.com"));
+    assert!(v["host"]
+        .as_str()
+        .unwrap()
+        .contains("gitlab.deepwisdomai.com"));
 }
 
 #[test]
 fn from_url_issue() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/issues/45"]).output().unwrap();
+    let out = cmd()
+        .args(["from-url", "https://gitlab.example.com/g/p/-/issues/45"])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "issue");
@@ -29,7 +42,13 @@ fn from_url_issue() {
 
 #[test]
 fn from_url_blob() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/blob/main/src/lib.rs"]).output().unwrap();
+    let out = cmd()
+        .args([
+            "from-url",
+            "https://gitlab.example.com/g/p/-/blob/main/src/lib.rs",
+        ])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "file");
@@ -40,7 +59,13 @@ fn from_url_blob() {
 
 #[test]
 fn from_url_blob_with_sha() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/blob/abc123def/path/to/file.py"]).output().unwrap();
+    let out = cmd()
+        .args([
+            "from-url",
+            "https://gitlab.example.com/g/p/-/blob/abc123def/path/to/file.py",
+        ])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["ref"], "abc123def");
@@ -49,7 +74,10 @@ fn from_url_blob_with_sha() {
 
 #[test]
 fn from_url_commit() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/commit/abc123"]).output().unwrap();
+    let out = cmd()
+        .args(["from-url", "https://gitlab.example.com/g/p/-/commit/abc123"])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "commit");
@@ -58,7 +86,13 @@ fn from_url_commit() {
 
 #[test]
 fn from_url_pipeline() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/pipelines/9999"]).output().unwrap();
+    let out = cmd()
+        .args([
+            "from-url",
+            "https://gitlab.example.com/g/p/-/pipelines/9999",
+        ])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "pipeline");
@@ -67,7 +101,10 @@ fn from_url_pipeline() {
 
 #[test]
 fn from_url_project_root() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p"]).output().unwrap();
+    let out = cmd()
+        .args(["from-url", "https://gitlab.example.com/g/p"])
+        .output()
+        .unwrap();
     assert!(out.status.success());
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(v["kind"], "project");
@@ -82,7 +119,13 @@ fn from_url_invalid_returns_2() {
 
 #[test]
 fn from_url_includes_suggested_command() {
-    let out = cmd().args(["from-url", "https://gitlab.example.com/g/p/-/merge_requests/5"]).output().unwrap();
+    let out = cmd()
+        .args([
+            "from-url",
+            "https://gitlab.example.com/g/p/-/merge_requests/5",
+        ])
+        .output()
+        .unwrap();
     let v: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert!(v["suggested"].as_str().unwrap().contains("gitlab mr"));
 }

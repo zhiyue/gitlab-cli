@@ -88,11 +88,22 @@ pub fn run(args: ManifestArgs) -> Result<()> {
             emit_object(&v)?;
         }
         (Some(cmd), None) => {
-            let entry = data.commands.iter().find(|c| c.name == cmd)
-                .ok_or_else(|| anyhow!("unknown command: {cmd}. Run 'gitlab manifest' for the list."))?;
+            let entry = data
+                .commands
+                .iter()
+                .find(|c| c.name == cmd)
+                .ok_or_else(|| {
+                    anyhow!("unknown command: {cmd}. Run 'gitlab manifest' for the list.")
+                })?;
             let verbs: Vec<&VerbEntry> = data.verbs.iter().filter(|v| v.command == cmd).collect();
-            let quirks: Vec<&QuirkEntry> = data.quirks.iter()
-                .filter(|q| q.area.starts_with(&cmd) || q.area.contains(&format!(" {cmd}")) || q.area.contains(&format!("{cmd} ")))
+            let quirks: Vec<&QuirkEntry> = data
+                .quirks
+                .iter()
+                .filter(|q| {
+                    q.area.starts_with(&cmd)
+                        || q.area.contains(&format!(" {cmd}"))
+                        || q.area.contains(&format!("{cmd} "))
+                })
                 .collect();
             let v = json!({
                 "name": entry.name,
@@ -104,7 +115,10 @@ pub fn run(args: ManifestArgs) -> Result<()> {
             emit_object(&v)?;
         }
         (Some(cmd), Some(verb)) => {
-            let entry = data.verbs.iter().find(|v| v.command == cmd && v.verb == verb)
+            let entry = data
+                .verbs
+                .iter()
+                .find(|v| v.command == cmd && v.verb == verb)
                 .cloned();
             let v = match entry {
                 Some(e) => json!({

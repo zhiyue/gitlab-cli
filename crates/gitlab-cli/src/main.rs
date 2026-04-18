@@ -172,7 +172,9 @@ fn main() -> std::process::ExitCode {
                     Command::Note { cmd } => gitlab_cli::cmd::note::run(ctx, cmd).await,
                     Command::Discussion { cmd } => gitlab_cli::cmd::discussion::run(ctx, cmd).await,
                     Command::Search(args) => gitlab_cli::cmd::search::run(ctx, args).await,
-                    Command::Manifest(_) | Command::FromUrl(_) => unreachable!("handled before Context::build"),
+                    Command::Manifest(_) | Command::FromUrl(_) => {
+                        unreachable!("handled before Context::build")
+                    }
                 }
             })
         }

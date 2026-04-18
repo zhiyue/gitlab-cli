@@ -62,15 +62,15 @@ fn parse_path(host: &str, path: &str) -> Result<Value> {
                 .map_err(|_| anyhow!("issue iid not a number"))?;
             out["kind"] = json!("issue");
             out["issue"] = json!(iid);
-            out["suggested"] =
-                json!(format!("gitlab issue get --project {project} --issue {iid}"));
+            out["suggested"] = json!(format!(
+                "gitlab issue get --project {project} --issue {iid}"
+            ));
         }
         "commit" => {
             let sha = parts.next().ok_or_else(|| anyhow!("missing commit sha"))?;
             out["kind"] = json!("commit");
             out["sha"] = json!(sha);
-            out["suggested"] =
-                json!(format!("gitlab commit get --project {project} --sha {sha}"));
+            out["suggested"] = json!(format!("gitlab commit get --project {project} --sha {sha}"));
         }
         "blob" | "raw" => {
             let rref = parts.next().ok_or_else(|| anyhow!("missing ref"))?;
@@ -86,15 +86,13 @@ fn parse_path(host: &str, path: &str) -> Result<Value> {
             let rref = parts.next().unwrap_or("HEAD");
             out["kind"] = json!("tree");
             out["ref"] = json!(rref);
-            out["suggested"] =
-                json!(format!("gitlab repo tree --project {project} --ref {rref}"));
+            out["suggested"] = json!(format!("gitlab repo tree --project {project} --ref {rref}"));
         }
         "tags" => {
             let name = parts.next().ok_or_else(|| anyhow!("missing tag name"))?;
             out["kind"] = json!("tag");
             out["tag"] = json!(name);
-            out["suggested"] =
-                json!(format!("gitlab tag get --project {project} --name {name}"));
+            out["suggested"] = json!(format!("gitlab tag get --project {project} --name {name}"));
         }
         "pipelines" => {
             let id: u64 = parts
@@ -104,8 +102,7 @@ fn parse_path(host: &str, path: &str) -> Result<Value> {
                 .map_err(|_| anyhow!("pipeline id not a number"))?;
             out["kind"] = json!("pipeline");
             out["pipeline"] = json!(id);
-            out["suggested"] =
-                json!(format!("gitlab pipeline get --project {project} --id {id}"));
+            out["suggested"] = json!(format!("gitlab pipeline get --project {project} --id {id}"));
         }
         "jobs" => {
             let id: u64 = parts

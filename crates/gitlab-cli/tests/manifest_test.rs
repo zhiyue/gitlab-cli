@@ -3,7 +3,8 @@ use serde_json::Value;
 
 fn cmd() -> Command {
     let mut c = Command::cargo_bin("gitlab").unwrap();
-    c.env("GITLAB_HOST", "https://example.com").env("GITLAB_TOKEN", "glpat-x");
+    c.env("GITLAB_HOST", "https://example.com")
+        .env("GITLAB_TOKEN", "glpat-x");
     c
 }
 
@@ -16,7 +17,11 @@ fn manifest_index_lists_commands_and_quirks() {
     assert!(v["instance"].as_str().unwrap().contains("14.0.5"));
     assert!(v["exit_codes"]["5"].as_str().unwrap().contains("not_found"));
     let cmds = v["commands"].as_array().unwrap();
-    assert!(cmds.len() >= 17, "expected ≥17 commands, got {}", cmds.len());
+    assert!(
+        cmds.len() >= 17,
+        "expected ≥17 commands, got {}",
+        cmds.len()
+    );
     assert!(cmds.iter().any(|c| c["name"] == "mr"));
     assert!(cmds.iter().any(|c| c["name"] == "api"));
     assert!(v["agent_hints"].as_array().unwrap().len() >= 3);
@@ -33,7 +38,10 @@ fn manifest_command_detail_includes_verbs() {
     assert!(verbs.iter().any(|x| x["verb"] == "commits"));
     // commits verb has a known quirk
     let commits = verbs.iter().find(|x| x["verb"] == "commits").unwrap();
-    assert!(commits.get("quirk").is_some(), "mr commits should document parent_ids quirk");
+    assert!(
+        commits.get("quirk").is_some(),
+        "mr commits should document parent_ids quirk"
+    );
 }
 
 #[test]

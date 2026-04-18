@@ -23,11 +23,12 @@ fetch_sha() {
 
 echo "==> Fetching sha256 for ${TAG}"
 mac_arm="$(fetch_sha aarch64-apple-darwin)"
-mac_x86="$(fetch_sha x86_64-apple-darwin)"
 linux_arm="$(fetch_sha aarch64-unknown-linux-gnu)"
 linux_x86="$(fetch_sha x86_64-unknown-linux-gnu)"
 
-for v in "$mac_arm" "$mac_x86" "$linux_arm" "$linux_x86"; do
+# x86_64-apple-darwin (Intel Mac) deferred — see release.yml comment.
+
+for v in "$mac_arm" "$linux_arm" "$linux_x86"; do
     if [ -z "$v" ] || [ "${#v}" -ne 64 ]; then
         echo "error: one of the sha256 values is missing or malformed" >&2
         exit 1
@@ -48,14 +49,13 @@ class GitlabCli < Formula
   license "Apache-2.0"
   version "${VERSION}"
 
+  # Intel Mac (x86_64-apple-darwin) build is not published; arm64 only.
+  # Intel Mac users can install via the curl|sh installer or build from source.
+  depends_on arch: :arm64
+
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/${REPO}/releases/download/${TAG}/gitlab-cli-${TAG}-aarch64-apple-darwin.tar.gz"
-      sha256 "${mac_arm}"
-    else
-      url "https://github.com/${REPO}/releases/download/${TAG}/gitlab-cli-${TAG}-x86_64-apple-darwin.tar.gz"
-      sha256 "${mac_x86}"
-    end
+    url "https://github.com/${REPO}/releases/download/${TAG}/gitlab-cli-${TAG}-aarch64-apple-darwin.tar.gz"
+    sha256 "${mac_arm}"
   end
 
   on_linux do
@@ -85,6 +85,5 @@ echo ""
 echo "Summary:"
 echo "  version:   $VERSION"
 echo "  mac-arm:   $mac_arm"
-echo "  mac-x86:   $mac_x86"
 echo "  linux-arm: $linux_arm"
 echo "  linux-x86: $linux_x86"

@@ -1,9 +1,11 @@
 [graph]
 targets = [
+  { triple = "x86_64-unknown-linux-gnu" },
+  { triple = "aarch64-unknown-linux-gnu" },
   { triple = "x86_64-unknown-linux-musl" },
   { triple = "aarch64-unknown-linux-musl" },
-  { triple = "x86_64-apple-darwin" },
   { triple = "aarch64-apple-darwin" },
+  { triple = "x86_64-pc-windows-msvc" },
 ]
 
 [advisories]
@@ -11,5 +13,23 @@ yanked = "warn"
 ignore = []
 
 [licenses]
-allow = ["MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "ISC", "Unicode-DFS-2016", "MPL-2.0", "Zlib", "CC0-1.0"]
+allow = [
+  "MIT",
+  "Apache-2.0",
+  "BSD-3-Clause",
+  "BSD-2-Clause",
+  "ISC",
+  "Unicode-DFS-2016",
+  "Unicode-3.0",        # icu_* crates pulled in by url → idna
+  "CDLA-Permissive-2.0", # webpki-roots
+  "MPL-2.0",
+  "Zlib",
+  "CC0-1.0",
+]
 confidence-threshold = 0.8
+
+# hashbrown is pulled in twice via different transitive dep chains
+# (toml_edit + indexmap). Both are pinned indirectly; allow the duplicate.
+[bans]
+multiple-versions = "warn"
+wildcards         = "warn"

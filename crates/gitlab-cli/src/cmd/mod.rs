@@ -1,15 +1,15 @@
 pub mod api;
 pub mod branch;
-pub mod from_url;
-pub mod manifest;
 pub mod commit;
 pub mod config;
 pub mod discussion;
 pub mod file;
+pub mod from_url;
 pub mod group;
 pub mod issue;
 pub mod job;
 pub mod label;
+pub mod manifest;
 pub mod me;
 pub mod mr;
 pub mod note;
