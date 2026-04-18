@@ -12,7 +12,13 @@ pub struct RetryPolicy {
 
 impl Default for RetryPolicy {
     fn default() -> Self {
-        Self { max_attempts: 4, max_attempts_429: 5, base_ms: 500, factor: 2, jitter_pct: 20 }
+        Self {
+            max_attempts: 4,
+            max_attempts_429: 5,
+            base_ms: 500,
+            factor: 2,
+            jitter_pct: 20,
+        }
     }
 }
 
@@ -47,7 +53,11 @@ impl RetryPolicy {
     }
 
     #[must_use]
-    pub fn next_delay_for_429(&self, retry_after: Option<&str>, attempt_idx: usize) -> Option<Duration> {
+    pub fn next_delay_for_429(
+        &self,
+        retry_after: Option<&str>,
+        attempt_idx: usize,
+    ) -> Option<Duration> {
         if let Some(s) = retry_after {
             if let Ok(secs) = s.trim().parse::<u64>() {
                 return Some(Duration::from_secs(secs));

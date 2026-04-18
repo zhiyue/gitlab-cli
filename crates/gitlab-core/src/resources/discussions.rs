@@ -1,10 +1,14 @@
-use reqwest::Method;
+use super::encode_id;
 use crate::page::PageRequest;
 use crate::request::RequestSpec;
-use super::encode_id;
+use reqwest::Method;
 
 #[derive(Debug, Clone, Copy)]
-pub enum Kind { Issue, Mr, Commit }
+pub enum Kind {
+    Issue,
+    Mr,
+    Commit,
+}
 
 impl Kind {
     #[must_use]
@@ -18,7 +22,12 @@ impl Kind {
 }
 
 fn base(project: &str, kind: Kind, target: &str) -> String {
-    format!("projects/{}/{}/{}/discussions", encode_id(project), kind.plural(), encode_id(target))
+    format!(
+        "projects/{}/{}/{}/discussions",
+        encode_id(project),
+        kind.plural(),
+        encode_id(target)
+    )
 }
 
 #[must_use]

@@ -19,5 +19,8 @@ async fn enabled_throttle_spaces_requests() {
         t.acquire().await;
     }
     let elapsed = start.elapsed().as_millis();
-    assert!(elapsed >= 800, "10 reqs @ 5 rps should take ≥ 0.8s, got {elapsed}ms");
+    assert!(
+        elapsed >= 800,
+        "10 reqs @ 5 rps should take ≥ 0.8s, got {elapsed}ms"
+    );
 }

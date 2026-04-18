@@ -20,13 +20,21 @@ async fn setup_3_pages(server: &MockServer) {
     Mock::given(method("GET"))
         .and(path("/api/v4/projects"))
         .and(query_param("page", "1"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(&p1).insert_header("Link", &link_p1))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(&p1)
+                .insert_header("Link", &link_p1),
+        )
         .mount(server)
         .await;
     Mock::given(method("GET"))
         .and(path("/api/v4/projects"))
         .and(query_param("page", "2"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(&p2).insert_header("Link", &link_p2))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(&p2)
+                .insert_header("Link", &link_p2),
+        )
         .mount(server)
         .await;
     Mock::given(method("GET"))

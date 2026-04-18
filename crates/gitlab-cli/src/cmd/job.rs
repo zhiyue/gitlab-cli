@@ -53,7 +53,9 @@ pub async fn run(ctx: Context, cmd: JobCmd) -> Result<()> {
             emit_object(&v)?;
         }
         JobCmd::Play(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("play job {}", t.id))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("play job {}", t.id))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(jobs::play(&t.project, t.id)).await?;
             emit_object(&v)?;
         }
@@ -66,7 +68,9 @@ pub async fn run(ctx: Context, cmd: JobCmd) -> Result<()> {
             emit_object(&v)?;
         }
         JobCmd::Erase(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("erase job {}", t.id))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("erase job {}", t.id))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(jobs::erase(&t.project, t.id)).await?;
             emit_object(&v)?;
         }
@@ -75,7 +79,10 @@ pub async fn run(ctx: Context, cmd: JobCmd) -> Result<()> {
             std::io::stdout().write_all(&bytes).ok();
         }
         JobCmd::Artifacts(t) => {
-            let (_s, _h, bytes) = ctx.client.send_raw(jobs::artifacts(&t.project, t.id)).await?;
+            let (_s, _h, bytes) = ctx
+                .client
+                .send_raw(jobs::artifacts(&t.project, t.id))
+                .await?;
             std::io::stdout().write_all(&bytes).ok();
         }
     }

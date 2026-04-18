@@ -84,11 +84,6 @@ async fn mr_crud_and_actions() {
         .mount(&server)
         .await;
     Mock::given(method("GET"))
-        .and(path("/api/v4/projects/1/merge_requests/5/diffs"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!([])))
-        .mount(&server)
-        .await;
-    Mock::given(method("GET"))
         .and(path("/api/v4/projects/1/merge_requests/5/commits"))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!([{"id":"abc"}])))
         .mount(&server)
@@ -149,10 +144,6 @@ async fn mr_crud_and_actions() {
         .success();
     env_cmd(&server.uri())
         .args(["mr", "changes", "--project", "1", "--mr", "5"])
-        .assert()
-        .success();
-    env_cmd(&server.uri())
-        .args(["mr", "diffs", "--project", "1", "--mr", "5"])
         .assert()
         .success();
     env_cmd(&server.uri())

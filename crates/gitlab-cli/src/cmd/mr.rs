@@ -20,7 +20,6 @@ pub enum MrCmd {
     Approve(Target),
     Unapprove(Target),
     Changes(Target),
-    Diffs(Target),
     Commits(Target),
     Pipelines(Target),
 }
@@ -183,13 +182,6 @@ pub async fn run(ctx: Context, cmd: MrCmd) -> Result<()> {
                 .send_json(mr::changes_spec(&t.project, t.mr))
                 .await?;
             emit_object(&v)?;
-        }
-        MrCmd::Diffs(t) => {
-            let stream = PagedStream::<serde_json::Value>::start(
-                &ctx.client,
-                mr::diffs_page(&t.project, t.mr),
-            );
-            emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         MrCmd::Commits(t) => {
             let stream = PagedStream::<serde_json::Value>::start(

@@ -16,8 +16,7 @@ async fn retries_on_500_then_succeeds() {
     Mock::given(method("GET"))
         .and(path("/api/v4/version"))
         .respond_with(
-            ResponseTemplate::new(200)
-                .set_body_json(serde_json::json!({"version":"14.0.5-ee"})),
+            ResponseTemplate::new(200).set_body_json(serde_json::json!({"version":"14.0.5-ee"})),
         )
         .mount(&server)
         .await;
@@ -61,9 +60,7 @@ async fn honors_retry_after_on_429() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))
         .and(path("/api/v4/version"))
-        .respond_with(
-            ResponseTemplate::new(429).insert_header("Retry-After", "1"),
-        )
+        .respond_with(ResponseTemplate::new(429).insert_header("Retry-After", "1"))
         .up_to_n_times(1)
         .mount(&server)
         .await;
@@ -81,6 +78,9 @@ async fn honors_retry_after_on_429() {
     })
     .unwrap();
     let start = std::time::Instant::now();
-    let _: serde_json::Value = client.send_json(RequestSpec::new(Method::GET, "version")).await.unwrap();
+    let _: serde_json::Value = client
+        .send_json(RequestSpec::new(Method::GET, "version"))
+        .await
+        .unwrap();
     assert!(start.elapsed().as_millis() >= 900);
 }

@@ -52,7 +52,10 @@ pub async fn run(ctx: Context, cmd: PipelineCmd) -> Result<()> {
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         PipelineCmd::Get(t) => {
-            let v: serde_json::Value = ctx.client.send_json(pipelines::get(&t.project, t.id)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(pipelines::get(&t.project, t.id))
+                .await?;
             emit_object(&v)?;
         }
         PipelineCmd::Create(a) => {
@@ -66,21 +69,34 @@ pub async fn run(ctx: Context, cmd: PipelineCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, "create pipeline")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "create pipeline")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
         PipelineCmd::Retry(t) => {
-            let v: serde_json::Value = ctx.client.send_json(pipelines::retry(&t.project, t.id)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(pipelines::retry(&t.project, t.id))
+                .await?;
             emit_object(&v)?;
         }
         PipelineCmd::Cancel(t) => {
-            let v: serde_json::Value = ctx.client.send_json(pipelines::cancel(&t.project, t.id)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(pipelines::cancel(&t.project, t.id))
+                .await?;
             emit_object(&v)?;
         }
         PipelineCmd::Delete(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("delete pipeline {}", t.id))? { anyhow::bail!("aborted"); }
-            let _ = ctx.client.send_raw(pipelines::delete(&t.project, t.id)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("delete pipeline {}", t.id))? {
+                anyhow::bail!("aborted");
+            }
+            let _ = ctx
+                .client
+                .send_raw(pipelines::delete(&t.project, t.id))
+                .await?;
         }
         PipelineCmd::Variables(t) => {
             let stream = PagedStream::<serde_json::Value>::start(

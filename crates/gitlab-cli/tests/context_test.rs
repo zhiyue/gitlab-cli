@@ -1,4 +1,4 @@
-use gitlab_cli::context::{Context, CliInputs};
+use gitlab_cli::context::{CliInputs, Context};
 use gitlab_cli::globals::{GlobalArgs, OutputFormat};
 
 fn defaults() -> GlobalArgs {
@@ -23,7 +23,11 @@ fn defaults() -> GlobalArgs {
 #[test]
 fn context_requires_token_somewhere() {
     let globals = defaults();
-    let err = Context::build(CliInputs { globals, config_text: String::new() }).unwrap_err();
+    let err = Context::build(CliInputs {
+        globals,
+        config_text: String::new(),
+    })
+    .unwrap_err();
     assert!(err.to_string().contains("no host") || err.to_string().contains("no PAT"));
 }
 
@@ -32,7 +36,14 @@ fn context_builds_with_flag_inputs() {
     let mut g = defaults();
     g.host = Some("https://example.com".into());
     g.token = Some("glpat-z".into());
-    let ctx = Context::build(CliInputs { globals: g, config_text: String::new() }).unwrap();
+    let ctx = Context::build(CliInputs {
+        globals: g,
+        config_text: String::new(),
+    })
+    .unwrap();
     assert_eq!(ctx.host, "https://example.com");
-    assert_eq!(ctx.client.base_url().as_str(), "https://example.com/api/v4/");
+    assert_eq!(
+        ctx.client.base_url().as_str(),
+        "https://example.com/api/v4/"
+    );
 }

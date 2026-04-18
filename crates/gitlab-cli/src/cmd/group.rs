@@ -20,22 +20,35 @@ pub enum GroupCmd {
 }
 
 #[derive(Args, Debug)]
-pub struct ListArgs { #[arg(long)] pub search: Option<String> }
-
-#[derive(Args, Debug)]
-pub struct CreateArgs {
-    #[arg(long)] pub name: String,
-    #[arg(long)] pub path: String,
-    #[arg(long)] pub parent_id: Option<u64>,
+pub struct ListArgs {
+    #[arg(long)]
+    pub search: Option<String>,
 }
 
 #[derive(Args, Debug)]
-pub struct UpdateArgs { pub id: String, #[arg(long)] pub data: String }
+pub struct CreateArgs {
+    #[arg(long)]
+    pub name: String,
+    #[arg(long)]
+    pub path: String,
+    #[arg(long)]
+    pub parent_id: Option<u64>,
+}
+
+#[derive(Args, Debug)]
+pub struct UpdateArgs {
+    pub id: String,
+    #[arg(long)]
+    pub data: String,
+}
 
 pub async fn run(ctx: Context, cmd: GroupCmd) -> Result<()> {
     match cmd {
         GroupCmd::List(a) => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, groups::list_spec(a.search.as_deref()));
+            let stream = PagedStream::<serde_json::Value>::start(
+                &ctx.client,
+                groups::list_spec(a.search.as_deref()),
+            );
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         GroupCmd::Get { id } => {
@@ -43,27 +56,34 @@ pub async fn run(ctx: Context, cmd: GroupCmd) -> Result<()> {
             emit_object(&v)?;
         }
         GroupCmd::Members { id } => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, groups::members_spec(&id));
+            let stream =
+                PagedStream::<serde_json::Value>::start(&ctx.client, groups::members_spec(&id));
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         GroupCmd::Projects { id } => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, groups::projects_spec(&id));
+            let stream =
+                PagedStream::<serde_json::Value>::start(&ctx.client, groups::projects_spec(&id));
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         GroupCmd::Subgroups { id } => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, groups::subgroups_spec(&id));
+            let stream =
+                PagedStream::<serde_json::Value>::start(&ctx.client, groups::subgroups_spec(&id));
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         GroupCmd::Create(a) => {
             let spec = groups::create_spec(&a.name, &a.path, a.parent_id);
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: spec.body.clone(),
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: spec.body.clone(),
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, "create group")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "create group")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -72,12 +92,16 @@ pub async fn run(ctx: Context, cmd: GroupCmd) -> Result<()> {
             let spec = groups::update_spec(&a.id, &body);
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: spec.body.clone(),
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: spec.body.clone(),
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("update group {}", a.id))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("update group {}", a.id))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -85,12 +109,16 @@ pub async fn run(ctx: Context, cmd: GroupCmd) -> Result<()> {
             let spec = groups::delete_spec(&id);
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: None,
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: None,
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("delete group {id}"))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("delete group {id}"))? {
+                anyhow::bail!("aborted");
+            }
             let _ = ctx.client.send_raw(spec).await?;
         }
     }

@@ -31,7 +31,8 @@ async fn me_prints_json() {
     Mock::given(method("GET"))
         .and(path("/api/v4/user"))
         .respond_with(
-            ResponseTemplate::new(200).set_body_json(serde_json::json!({"id":1,"username":"alice"})),
+            ResponseTemplate::new(200)
+                .set_body_json(serde_json::json!({"id":1,"username":"alice"})),
         )
         .mount(&server)
         .await;

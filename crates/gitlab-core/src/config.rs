@@ -18,6 +18,10 @@ pub struct HostConfig {
     pub tls_skip_verify: bool,
     pub rps: Option<u32>,
     pub default_project: Option<String>,
+    /// When true, write commands skip the interactive 'type yes' prompt for this host.
+    /// Equivalent to passing `--yes` / setting `GITLAB_ASSUME_YES=1`.
+    #[serde(default)]
+    pub assume_yes: bool,
 }
 
 impl Config {

@@ -28,15 +28,20 @@ pub enum ProjectCmd {
 
 #[derive(Args, Debug)]
 pub struct ListArgs {
-    #[arg(long)] pub visibility: Option<String>,
-    #[arg(long)] pub search: Option<String>,
+    #[arg(long)]
+    pub visibility: Option<String>,
+    #[arg(long)]
+    pub search: Option<String>,
 }
 
 #[derive(Args, Debug)]
 pub struct CreateArgs {
-    #[arg(long)] pub name: String,
-    #[arg(long)] pub path: Option<String>,
-    #[arg(long)] pub visibility: Option<String>,
+    #[arg(long)]
+    pub name: String,
+    #[arg(long)]
+    pub path: Option<String>,
+    #[arg(long)]
+    pub visibility: Option<String>,
 }
 
 #[derive(Args, Debug)]
@@ -64,12 +69,16 @@ pub async fn run(ctx: Context, cmd: ProjectCmd) -> Result<()> {
             let spec = projects::create_spec(&a.name, a.path.as_deref(), a.visibility.as_deref());
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: spec.body.clone(),
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: spec.body.clone(),
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, "create project")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "create project")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -78,12 +87,16 @@ pub async fn run(ctx: Context, cmd: ProjectCmd) -> Result<()> {
             let spec = projects::update_spec(&a.id, &body);
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: spec.body.clone(),
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: spec.body.clone(),
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("update project {}", a.id))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("update project {}", a.id))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -91,12 +104,16 @@ pub async fn run(ctx: Context, cmd: ProjectCmd) -> Result<()> {
             let spec = projects::delete_spec(&id);
             if ctx.dry_run {
                 emit_object(&dry_run_envelope(&Intent {
-                    method: spec.method.clone(), path: spec.path.clone(),
-                    query: spec.query.clone(), body: None,
+                    method: spec.method.clone(),
+                    path: spec.path.clone(),
+                    query: spec.query.clone(),
+                    body: None,
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("delete project {id}"))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("delete project {id}"))? {
+                anyhow::bail!("aborted");
+            }
             let _ = ctx.client.send_raw(spec).await?;
         }
         ProjectCmd::Fork { id } => {

@@ -1,10 +1,15 @@
-use reqwest::Method;
+use super::encode_id;
 use crate::page::PageRequest;
 use crate::request::RequestSpec;
-use super::encode_id;
+use reqwest::Method;
 
 #[derive(Debug, Clone, Copy)]
-pub enum Kind { Issue, Mr, Commit, Snippet }
+pub enum Kind {
+    Issue,
+    Mr,
+    Commit,
+    Snippet,
+}
 
 impl Kind {
     #[must_use]
@@ -19,7 +24,12 @@ impl Kind {
 }
 
 fn base(project: &str, kind: Kind, target: &str) -> String {
-    format!("projects/{}/{}/{}/notes", encode_id(project), kind.plural(), encode_id(target))
+    format!(
+        "projects/{}/{}/{}/notes",
+        encode_id(project),
+        kind.plural(),
+        encode_id(target)
+    )
 }
 
 #[must_use]
@@ -46,5 +56,8 @@ pub fn update(project: &str, kind: Kind, target: &str, id: u64, body: &str) -> R
 
 #[must_use]
 pub fn delete(project: &str, kind: Kind, target: &str, id: u64) -> RequestSpec {
-    RequestSpec::new(Method::DELETE, format!("{}/{id}", base(project, kind, target)))
+    RequestSpec::new(
+        Method::DELETE,
+        format!("{}/{id}", base(project, kind, target)),
+    )
 }

@@ -12,7 +12,11 @@ pub fn emit_object<T: Serialize>(v: &T) -> io::Result<()> {
 }
 
 #[allow(clippy::cast_possible_truncation)]
-pub async fn emit_stream<T, S>(stream: S, fmt: OutputFormat, limit: Option<u32>) -> io::Result<usize>
+pub async fn emit_stream<T, S>(
+    stream: S,
+    fmt: OutputFormat,
+    limit: Option<u32>,
+) -> io::Result<usize>
 where
     T: Serialize,
     S: Stream<Item = Result<T, gitlab_core::error::GitlabError>>,
@@ -27,12 +31,16 @@ where
             let mut first = true;
             while let Some(item) = stream.next().await {
                 let it = item.map_err(|e| io::Error::other(e.to_string()))?;
-                if !first { lock.write_all(b",")?; }
+                if !first {
+                    lock.write_all(b",")?;
+                }
                 first = false;
                 serde_json::to_writer(&mut lock, &it)?;
                 count += 1;
                 if let Some(n) = limit {
-                    if count as u32 >= n { break; }
+                    if count as u32 >= n {
+                        break;
+                    }
                 }
             }
             lock.write_all(b"]\n")?;
@@ -44,7 +52,9 @@ where
                 lock.write_all(b"\n")?;
                 count += 1;
                 if let Some(n) = limit {
-                    if count as u32 >= n { break; }
+                    if count as u32 >= n {
+                        break;
+                    }
                 }
             }
         }

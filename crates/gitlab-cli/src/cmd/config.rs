@@ -50,7 +50,10 @@ pub fn run(cmd: ConfigCmd, cfg_path: Option<PathBuf>) -> Result<()> {
         }
         ConfigCmd::SetToken(a) => {
             let mut cfg = Config::load_from(&path).map_err(|e| anyhow!(e.to_string()))?;
-            let hc = cfg.host.entry(a.host.clone()).or_insert_with(HostConfig::default);
+            let hc = cfg
+                .host
+                .entry(a.host.clone())
+                .or_insert_with(HostConfig::default);
             hc.token = Some(a.token);
             if a.default || cfg.default_host.is_none() {
                 cfg.default_host = Some(a.host);

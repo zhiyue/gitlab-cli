@@ -17,7 +17,11 @@ pub struct PageRequest {
 
 impl PageRequest {
     pub fn new(path: impl Into<String>) -> Self {
-        Self { path: path.into(), query: Vec::new(), per_page: 100 }
+        Self {
+            path: path.into(),
+            query: Vec::new(),
+            per_page: 100,
+        }
     }
 
     #[must_use]
@@ -34,7 +38,11 @@ pub struct PagedStream<T> {
 }
 
 impl<T: DeserializeOwned + Send + 'static> PagedStream<T> {
-    #[allow(clippy::while_let_loop, clippy::option_if_let_else, clippy::manual_let_else)]
+    #[allow(
+        clippy::while_let_loop,
+        clippy::option_if_let_else,
+        clippy::manual_let_else
+    )]
     pub fn start(client: &Client, req: PageRequest) -> impl Stream<Item = Result<T>> + Unpin {
         let client = client.clone();
         let stream = try_stream! {

@@ -8,10 +8,14 @@ use crate::output::emit_stream;
 
 #[derive(Args, Debug)]
 pub struct SearchArgs {
-    #[arg(long)] pub scope: String,
-    #[arg(long)] pub query: String,
-    #[arg(long, conflicts_with = "group")] pub project: Option<String>,
-    #[arg(long)] pub group: Option<String>,
+    #[arg(long)]
+    pub scope: String,
+    #[arg(long)]
+    pub query: String,
+    #[arg(long, conflicts_with = "group")]
+    pub project: Option<String>,
+    #[arg(long)]
+    pub group: Option<String>,
 }
 
 pub async fn run(ctx: Context, a: SearchArgs) -> Result<()> {

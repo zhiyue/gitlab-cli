@@ -1,13 +1,21 @@
-use reqwest::Method;
-use crate::request::RequestSpec;
 use super::encode_id;
+use crate::request::RequestSpec;
+use reqwest::Method;
 
 fn path_for(project: &str, file: &str, suffix: &str) -> String {
     let encoded_file = urlencoding::encode(file);
     if suffix.is_empty() {
-        format!("projects/{}/repository/files/{}", encode_id(project), encoded_file)
+        format!(
+            "projects/{}/repository/files/{}",
+            encode_id(project),
+            encoded_file
+        )
     } else {
-        format!("projects/{}/repository/files/{}/{suffix}", encode_id(project), encoded_file)
+        format!(
+            "projects/{}/repository/files/{}/{suffix}",
+            encode_id(project),
+            encoded_file
+        )
     }
 }
 
@@ -27,13 +35,25 @@ pub fn blame(project: &str, file: &str, rref: &str) -> RequestSpec {
 }
 
 #[must_use]
-pub fn create(project: &str, file: &str, branch: &str, content: &str, message: &str) -> RequestSpec {
+pub fn create(
+    project: &str,
+    file: &str,
+    branch: &str,
+    content: &str,
+    message: &str,
+) -> RequestSpec {
     RequestSpec::new(Method::POST, path_for(project, file, ""))
         .with_json(&serde_json::json!({"branch":branch,"content":content,"commit_message":message}))
 }
 
 #[must_use]
-pub fn update(project: &str, file: &str, branch: &str, content: &str, message: &str) -> RequestSpec {
+pub fn update(
+    project: &str,
+    file: &str,
+    branch: &str,
+    content: &str,
+    message: &str,
+) -> RequestSpec {
     RequestSpec::new(Method::PUT, path_for(project, file, ""))
         .with_json(&serde_json::json!({"branch":branch,"content":content,"commit_message":message}))
 }

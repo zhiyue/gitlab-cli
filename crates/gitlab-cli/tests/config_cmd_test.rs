@@ -22,7 +22,14 @@ fn config_set_token_writes_file() {
     Command::cargo_bin("gitlab")
         .unwrap()
         .env("GITLAB_CONFIG", &cfg_path)
-        .args(["config", "set-token", "--host", "gitlab.example.com", "--token", "glpat-AA"])
+        .args([
+            "config",
+            "set-token",
+            "--host",
+            "gitlab.example.com",
+            "--token",
+            "glpat-AA",
+        ])
         .assert()
         .success();
     let text = std::fs::read_to_string(&cfg_path).unwrap();
@@ -34,11 +41,15 @@ fn config_set_token_writes_file() {
 fn config_list_masks_tokens() {
     let dir = tempfile::tempdir().unwrap();
     let cfg_path = dir.path().join("config.toml");
-    std::fs::write(&cfg_path, r#"
+    std::fs::write(
+        &cfg_path,
+        r#"
 default_host = "gitlab.example.com"
 [host."gitlab.example.com"]
 token = "glpat-ABCDEFGHIJKL"
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     Command::cargo_bin("gitlab")
         .unwrap()
         .env("GITLAB_CONFIG", &cfg_path)

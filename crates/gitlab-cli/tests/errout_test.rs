@@ -4,7 +4,9 @@ use gitlab_cli_test_support::*;
 
 #[test]
 #[allow(clippy::assertions_on_constants)]
-fn placeholder_until_command_exists() { assert!(true); }
+fn placeholder_until_command_exists() {
+    assert!(true);
+}
 
 #[test]
 fn tracing_filter_parses_levels() {

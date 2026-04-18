@@ -65,17 +65,28 @@ pub async fn run(ctx: Context, cmd: CommitCmd) -> Result<()> {
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         CommitCmd::Get(t) => {
-            let v: serde_json::Value = ctx.client.send_json(commits::get(&t.project, &t.sha)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(commits::get(&t.project, &t.sha))
+                .await?;
             emit_object(&v)?;
         }
         CommitCmd::Create(a) => {
             let body = crate::cmd::load_json(&a.data)?;
-            if !confirm_or_skip(ctx.assume_yes, "create commit")? { anyhow::bail!("aborted"); }
-            let v: serde_json::Value = ctx.client.send_json(commits::create(&a.project, &body)).await?;
+            if !confirm_or_skip(ctx.assume_yes, "create commit")? {
+                anyhow::bail!("aborted");
+            }
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(commits::create(&a.project, &body))
+                .await?;
             emit_object(&v)?;
         }
         CommitCmd::Diff(t) => {
-            let v: serde_json::Value = ctx.client.send_json(commits::diff(&t.project, &t.sha)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(commits::diff(&t.project, &t.sha))
+                .await?;
             emit_object(&v)?;
         }
         CommitCmd::Comments(t) => {
@@ -93,17 +104,26 @@ pub async fn run(ctx: Context, cmd: CommitCmd) -> Result<()> {
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         CommitCmd::CherryPick(a) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("cherry-pick {} onto {}", a.sha, a.branch))? {
+            if !confirm_or_skip(
+                ctx.assume_yes,
+                &format!("cherry-pick {} onto {}", a.sha, a.branch),
+            )? {
                 anyhow::bail!("aborted");
             }
-            let v: serde_json::Value = ctx.client.send_json(commits::cherry_pick(&a.project, &a.sha, &a.branch)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(commits::cherry_pick(&a.project, &a.sha, &a.branch))
+                .await?;
             emit_object(&v)?;
         }
         CommitCmd::Revert(a) => {
             if !confirm_or_skip(ctx.assume_yes, &format!("revert {} on {}", a.sha, a.branch))? {
                 anyhow::bail!("aborted");
             }
-            let v: serde_json::Value = ctx.client.send_json(commits::revert(&a.project, &a.sha, &a.branch)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(commits::revert(&a.project, &a.sha, &a.branch))
+                .await?;
             emit_object(&v)?;
         }
         CommitCmd::Refs(t) => {

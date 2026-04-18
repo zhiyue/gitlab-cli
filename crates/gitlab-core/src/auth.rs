@@ -48,7 +48,11 @@ pub fn resolve_auth(inputs: AuthInputs, config: &Config) -> Result<ResolvedAuth>
             )
         })?;
 
-    Ok(ResolvedAuth { host, token, host_config: host_cfg })
+    Ok(ResolvedAuth {
+        host,
+        token,
+        host_config: host_cfg,
+    })
 }
 
 pub struct MaskedToken<'a>(pub &'a str);

@@ -1,5 +1,5 @@
-use crate::page::PageRequest;
 use super::encode_id;
+use crate::page::PageRequest;
 
 #[must_use]
 pub fn global(scope: &str, q: &str) -> PageRequest {

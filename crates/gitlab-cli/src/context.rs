@@ -26,7 +26,10 @@ pub struct Context {
 
 impl Context {
     pub fn build(inputs: CliInputs) -> Result<Self> {
-        let CliInputs { globals, config_text } = inputs;
+        let CliInputs {
+            globals,
+            config_text,
+        } = inputs;
 
         let cfg: Config = if config_text.trim().is_empty() {
             Config::default()
@@ -46,7 +49,11 @@ impl Context {
         .map_err(|e| anyhow!(e.to_string()))?;
 
         let retry = if globals.no_retry {
-            RetryPolicy { max_attempts: 0, max_attempts_429: 0, ..RetryPolicy::default() }
+            RetryPolicy {
+                max_attempts: 0,
+                max_attempts_429: 0,
+                ..RetryPolicy::default()
+            }
         } else {
             let mut p = RetryPolicy::default();
             if let Some(r) = globals.retries {
@@ -61,7 +68,9 @@ impl Context {
             _ => Throttle::disabled(),
         };
 
-        let req_timeout = globals.timeout.map_or(Duration::from_secs(30), Duration::from_secs);
+        let req_timeout = globals
+            .timeout
+            .map_or(Duration::from_secs(30), Duration::from_secs);
 
         let client = Client::new(ClientOptions {
             host: resolved.host.clone(),
@@ -78,7 +87,7 @@ impl Context {
         Ok(Self {
             host: resolved.host,
             client,
-            assume_yes: globals.assume_yes,
+            assume_yes: globals.assume_yes || resolved.host_config.assume_yes,
             dry_run: globals.dry_run,
             output: globals.output,
             limit: globals.limit,

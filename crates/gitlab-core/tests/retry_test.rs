@@ -1,5 +1,5 @@
 #[allow(unused_imports)]
-use gitlab_core::retry::{RetryPolicy, RetryPlan};
+use gitlab_core::retry::{RetryPlan, RetryPolicy};
 use std::time::Duration;
 
 #[test]
@@ -13,7 +13,9 @@ fn default_policy_returns_4_network_backoffs() {
         let tol = *want * 20 / 100;
         assert!(
             got.as_millis() as u64 >= want - tol && got.as_millis() as u64 <= want + tol,
-            "backoff {:?} not within 20% of {}ms", got, want
+            "backoff {:?} not within 20% of {}ms",
+            got,
+            want
         );
     }
 }
@@ -27,7 +29,10 @@ fn retry_after_header_beats_backoff() {
 
 #[test]
 fn no_retries_when_disabled() {
-    let p = RetryPolicy { max_attempts: 0, ..RetryPolicy::default() };
+    let p = RetryPolicy {
+        max_attempts: 0,
+        ..RetryPolicy::default()
+    };
     let plan = p.plan_for_network();
     assert!(plan.attempts.is_empty());
 }

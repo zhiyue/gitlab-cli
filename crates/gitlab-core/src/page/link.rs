@@ -29,7 +29,9 @@ pub fn parse_link_header(header: &str) -> Result<HashMap<Rel, String>> {
     }
     for entry in header.split(',') {
         let entry = entry.trim();
-        let Some((url_part, rest)) = entry.split_once(';') else { continue; };
+        let Some((url_part, rest)) = entry.split_once(';') else {
+            continue;
+        };
         let url = url_part.trim();
         if !url.starts_with('<') || !url.ends_with('>') {
             continue;
@@ -37,7 +39,9 @@ pub fn parse_link_header(header: &str) -> Result<HashMap<Rel, String>> {
         let url = &url[1..url.len() - 1];
         for param in rest.split(';') {
             let param = param.trim();
-            let Some((k, v)) = param.split_once('=') else { continue; };
+            let Some((k, v)) = param.split_once('=') else {
+                continue;
+            };
             if k.trim() != "rel" {
                 continue;
             }

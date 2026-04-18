@@ -7,7 +7,10 @@ fn cfg(host: &str, token: &str) -> Config {
     c.default_host = Some(host.into());
     c.host.insert(
         host.into(),
-        HostConfig { token: Some(token.into()), ..HostConfig::default() },
+        HostConfig {
+            token: Some(token.into()),
+            ..HostConfig::default()
+        },
     );
     c
 }
@@ -45,11 +48,7 @@ fn env_beats_config_when_no_flag() {
 
 #[test]
 fn config_is_last_fallback() {
-    let resolved = resolve_auth(
-        AuthInputs::default(),
-        &cfg("h", "cfg-tok"),
-    )
-    .unwrap();
+    let resolved = resolve_auth(AuthInputs::default(), &cfg("h", "cfg-tok")).unwrap();
     assert_eq!(resolved.token, "cfg-tok");
 }
 
@@ -64,7 +63,10 @@ fn host_precedence_flag_env_config() {
     let c = cfg("cfg-host", "tok");
     assert_eq!(
         resolve_auth(
-            AuthInputs { flag_host: Some("flag-host".into()), ..AuthInputs::default() },
+            AuthInputs {
+                flag_host: Some("flag-host".into()),
+                ..AuthInputs::default()
+            },
             &c
         )
         .unwrap()
@@ -73,12 +75,18 @@ fn host_precedence_flag_env_config() {
     );
     assert_eq!(
         resolve_auth(
-            AuthInputs { env_host: Some("env-host".into()), ..AuthInputs::default() },
+            AuthInputs {
+                env_host: Some("env-host".into()),
+                ..AuthInputs::default()
+            },
             &c
         )
         .unwrap()
         .host,
         "env-host"
     );
-    assert_eq!(resolve_auth(AuthInputs::default(), &c).unwrap().host, "cfg-host");
+    assert_eq!(
+        resolve_auth(AuthInputs::default(), &c).unwrap().host,
+        "cfg-host"
+    );
 }

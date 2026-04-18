@@ -11,7 +11,12 @@ pub struct RequestSpec {
 
 impl RequestSpec {
     pub fn new(method: Method, path: impl Into<String>) -> Self {
-        Self { method, path: path.into(), query: Vec::new(), body: None }
+        Self {
+            method,
+            path: path.into(),
+            query: Vec::new(),
+            body: None,
+        }
     }
 
     #[must_use]

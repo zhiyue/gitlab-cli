@@ -99,7 +99,10 @@ pub async fn run(ctx: Context, cmd: IssueCmd) -> Result<()> {
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         IssueCmd::Get(t) => {
-            let v: serde_json::Value = ctx.client.send_json(issues::get_spec(&t.project, t.issue)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(issues::get_spec(&t.project, t.issue))
+                .await?;
             emit_object(&v)?;
         }
         IssueCmd::Create(a) => {
@@ -113,7 +116,9 @@ pub async fn run(ctx: Context, cmd: IssueCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, "create issue")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "create issue")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
@@ -129,20 +134,31 @@ pub async fn run(ctx: Context, cmd: IssueCmd) -> Result<()> {
                 }))?;
                 std::process::exit(10);
             }
-            if !confirm_or_skip(ctx.assume_yes, &format!("update issue {}", a.issue))? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, &format!("update issue {}", a.issue))? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
         IssueCmd::Close(t) => {
-            let v: serde_json::Value = ctx.client.send_json(issues::close_spec(&t.project, t.issue)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(issues::close_spec(&t.project, t.issue))
+                .await?;
             emit_object(&v)?;
         }
         IssueCmd::Reopen(t) => {
-            let v: serde_json::Value = ctx.client.send_json(issues::reopen_spec(&t.project, t.issue)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(issues::reopen_spec(&t.project, t.issue))
+                .await?;
             emit_object(&v)?;
         }
         IssueCmd::Move(a) => {
-            let v: serde_json::Value = ctx.client.send_json(issues::move_spec(&a.project, a.issue, &a.to)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(issues::move_spec(&a.project, a.issue, &a.to))
+                .await?;
             emit_object(&v)?;
         }
         IssueCmd::Stats => {
@@ -151,13 +167,17 @@ pub async fn run(ctx: Context, cmd: IssueCmd) -> Result<()> {
         }
         IssueCmd::Link(a) => {
             let spec = issues::link_spec(&a.project, a.issue, &a.target_project, a.target_issue);
-            if !confirm_or_skip(ctx.assume_yes, "link issue")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "link issue")? {
+                anyhow::bail!("aborted");
+            }
             let v: serde_json::Value = ctx.client.send_json(spec).await?;
             emit_object(&v)?;
         }
         IssueCmd::Unlink(a) => {
             let spec = issues::unlink_spec(&a.project, a.issue, a.link_id);
-            if !confirm_or_skip(ctx.assume_yes, "unlink issue")? { anyhow::bail!("aborted"); }
+            if !confirm_or_skip(ctx.assume_yes, "unlink issue")? {
+                anyhow::bail!("aborted");
+            }
             let _ = ctx.client.send_raw(spec).await?;
         }
     }

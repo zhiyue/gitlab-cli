@@ -4,7 +4,10 @@ use gitlab_core::page::link::{parse_link_header, Rel};
 fn single_next_link() {
     let h = r#"<https://x/api/v4/projects?page=2>; rel="next""#;
     let links = parse_link_header(h).unwrap();
-    assert_eq!(links.get(&Rel::Next).unwrap(), "https://x/api/v4/projects?page=2");
+    assert_eq!(
+        links.get(&Rel::Next).unwrap(),
+        "https://x/api/v4/projects?page=2"
+    );
 }
 
 #[test]

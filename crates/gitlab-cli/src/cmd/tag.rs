@@ -44,10 +44,8 @@ pub struct CreateArgs {
 pub async fn run(ctx: Context, cmd: TagCmd) -> Result<()> {
     match cmd {
         TagCmd::List(a) => {
-            let stream = PagedStream::<serde_json::Value>::start(
-                &ctx.client,
-                tags::list(&a.project),
-            );
+            let stream =
+                PagedStream::<serde_json::Value>::start(&ctx.client, tags::list(&a.project));
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         TagCmd::Get(t) => {
@@ -55,21 +53,39 @@ pub async fn run(ctx: Context, cmd: TagCmd) -> Result<()> {
             emit_object(&v)?;
         }
         TagCmd::Create(a) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("create tag {}", a.name))? { anyhow::bail!("aborted"); }
-            let v: serde_json::Value = ctx.client.send_json(tags::create(&a.project, &a.name, &a.rref)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("create tag {}", a.name))? {
+                anyhow::bail!("aborted");
+            }
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(tags::create(&a.project, &a.name, &a.rref))
+                .await?;
             emit_object(&v)?;
         }
         TagCmd::Delete(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("delete tag {}", t.name))? { anyhow::bail!("aborted"); }
-            let _ = ctx.client.send_raw(tags::delete(&t.project, &t.name)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("delete tag {}", t.name))? {
+                anyhow::bail!("aborted");
+            }
+            let _ = ctx
+                .client
+                .send_raw(tags::delete(&t.project, &t.name))
+                .await?;
         }
         TagCmd::Protect(t) => {
-            let v: serde_json::Value = ctx.client.send_json(tags::protect(&t.project, &t.name)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(tags::protect(&t.project, &t.name))
+                .await?;
             emit_object(&v)?;
         }
         TagCmd::Unprotect(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("unprotect tag {}", t.name))? { anyhow::bail!("aborted"); }
-            let _ = ctx.client.send_raw(tags::unprotect(&t.project, &t.name)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("unprotect tag {}", t.name))? {
+                anyhow::bail!("aborted");
+            }
+            let _ = ctx
+                .client
+                .send_raw(tags::unprotect(&t.project, &t.name))
+                .await?;
         }
     }
     Ok(())

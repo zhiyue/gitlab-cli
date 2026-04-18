@@ -1,27 +1,34 @@
-use reqwest::Method;
+use super::encode_id;
 use crate::page::PageRequest;
 use crate::request::RequestSpec;
-use super::encode_id;
+use reqwest::Method;
 
 fn project_mr_path(project: &str, iid: u64, suffix: &str) -> String {
     if suffix.is_empty() {
         format!("projects/{}/merge_requests/{iid}", encode_id(project))
     } else {
-        format!("projects/{}/merge_requests/{iid}/{suffix}", encode_id(project))
+        format!(
+            "projects/{}/merge_requests/{iid}/{suffix}",
+            encode_id(project)
+        )
     }
 }
 
 #[must_use]
 pub fn list_for_project(project: &str, state: Option<&str>) -> PageRequest {
     let mut p = PageRequest::new(format!("projects/{}/merge_requests", encode_id(project)));
-    if let Some(s) = state { p.query.push(("state".into(), s.into())); }
+    if let Some(s) = state {
+        p.query.push(("state".into(), s.into()));
+    }
     p
 }
 
 #[must_use]
 pub fn list_for_group(group: &str, state: Option<&str>) -> PageRequest {
     let mut p = PageRequest::new(format!("groups/{}/merge_requests", encode_id(group)));
-    if let Some(s) = state { p.query.push(("state".into(), s.into())); }
+    if let Some(s) = state {
+        p.query.push(("state".into(), s.into()));
+    }
     p
 }
 
@@ -32,8 +39,13 @@ pub fn get_spec(project: &str, iid: u64) -> RequestSpec {
 
 #[must_use]
 pub fn create_spec(project: &str, source: &str, target: &str, title: &str) -> RequestSpec {
-    RequestSpec::new(Method::POST, format!("projects/{}/merge_requests", encode_id(project)))
-        .with_json(&serde_json::json!({"source_branch": source, "target_branch": target, "title": title}))
+    RequestSpec::new(
+        Method::POST,
+        format!("projects/{}/merge_requests", encode_id(project)),
+    )
+    .with_json(
+        &serde_json::json!({"source_branch": source, "target_branch": target, "title": title}),
+    )
 }
 
 #[must_use]
@@ -75,11 +87,6 @@ pub fn unapprove_spec(project: &str, iid: u64) -> RequestSpec {
 #[must_use]
 pub fn changes_spec(project: &str, iid: u64) -> RequestSpec {
     RequestSpec::new(Method::GET, project_mr_path(project, iid, "changes"))
-}
-
-#[must_use]
-pub fn diffs_page(project: &str, iid: u64) -> PageRequest {
-    PageRequest::new(project_mr_path(project, iid, "diffs"))
 }
 
 #[must_use]

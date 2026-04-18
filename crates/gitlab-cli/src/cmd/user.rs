@@ -17,18 +17,23 @@ pub enum UserCmd {
 
 #[derive(Args, Debug)]
 pub struct ListArgs {
-    #[arg(long)] pub search: Option<String>,
+    #[arg(long)]
+    pub search: Option<String>,
 }
 
 #[derive(Args, Debug)]
 pub struct IdArgs {
-    #[arg(long)] pub id: u64,
+    #[arg(long)]
+    pub id: u64,
 }
 
 pub async fn run(ctx: Context, cmd: UserCmd) -> Result<()> {
     match cmd {
         UserCmd::List(a) => {
-            let stream = PagedStream::<serde_json::Value>::start(&ctx.client, users::list(a.search.as_deref()));
+            let stream = PagedStream::<serde_json::Value>::start(
+                &ctx.client,
+                users::list(a.search.as_deref()),
+            );
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         UserCmd::Get(a) => {

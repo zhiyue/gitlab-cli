@@ -37,7 +37,10 @@ impl ErrorCode {
 
     #[must_use]
     pub fn retryable(self) -> bool {
-        matches!(self, Self::RateLimited | Self::ServerError | Self::Network | Self::Timeout)
+        matches!(
+            self,
+            Self::RateLimited | Self::ServerError | Self::Network | Self::Timeout
+        )
     }
 }
 
@@ -123,7 +126,13 @@ impl GitlabError {
     #[must_use]
     pub fn to_payload(&self) -> ErrorPayload {
         match self {
-            Self::Http { code, status, message, request_id, details } => ErrorPayload {
+            Self::Http {
+                code,
+                status,
+                message,
+                request_id,
+                details,
+            } => ErrorPayload {
                 code: *code,
                 status: Some(*status),
                 message: message.clone(),
@@ -147,7 +156,11 @@ pub type Result<T> = std::result::Result<T, GitlabError>;
 
 impl fmt::Display for ErrorCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let s = serde_json::to_value(self).unwrap().as_str().unwrap().to_owned();
+        let s = serde_json::to_value(self)
+            .unwrap()
+            .as_str()
+            .unwrap()
+            .to_owned();
         f.write_str(&s)
     }
 }

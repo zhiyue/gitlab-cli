@@ -53,25 +53,46 @@ pub async fn run(ctx: Context, cmd: BranchCmd) -> Result<()> {
             emit_stream(stream, ctx.output, ctx.limit).await?;
         }
         BranchCmd::Get(t) => {
-            let v: serde_json::Value = ctx.client.send_json(branches::get(&t.project, &t.name)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(branches::get(&t.project, &t.name))
+                .await?;
             emit_object(&v)?;
         }
         BranchCmd::Create(a) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("create branch {}", a.name))? { anyhow::bail!("aborted"); }
-            let v: serde_json::Value = ctx.client.send_json(branches::create(&a.project, &a.name, &a.rref)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("create branch {}", a.name))? {
+                anyhow::bail!("aborted");
+            }
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(branches::create(&a.project, &a.name, &a.rref))
+                .await?;
             emit_object(&v)?;
         }
         BranchCmd::Delete(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("delete branch {}", t.name))? { anyhow::bail!("aborted"); }
-            let _ = ctx.client.send_raw(branches::delete(&t.project, &t.name)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("delete branch {}", t.name))? {
+                anyhow::bail!("aborted");
+            }
+            let _ = ctx
+                .client
+                .send_raw(branches::delete(&t.project, &t.name))
+                .await?;
         }
         BranchCmd::Protect(t) => {
-            let v: serde_json::Value = ctx.client.send_json(branches::protect(&t.project, &t.name)).await?;
+            let v: serde_json::Value = ctx
+                .client
+                .send_json(branches::protect(&t.project, &t.name))
+                .await?;
             emit_object(&v)?;
         }
         BranchCmd::Unprotect(t) => {
-            if !confirm_or_skip(ctx.assume_yes, &format!("unprotect branch {}", t.name))? { anyhow::bail!("aborted"); }
-            let _ = ctx.client.send_raw(branches::unprotect(&t.project, &t.name)).await?;
+            if !confirm_or_skip(ctx.assume_yes, &format!("unprotect branch {}", t.name))? {
+                anyhow::bail!("aborted");
+            }
+            let _ = ctx
+                .client
+                .send_raw(branches::unprotect(&t.project, &t.name))
+                .await?;
         }
     }
     Ok(())

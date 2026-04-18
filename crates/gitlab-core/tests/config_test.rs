@@ -48,11 +48,26 @@ fn host_for_resolves_to_specified_then_default() {
     let cfg = Config {
         default_host: Some("a".into()),
         host: std::collections::HashMap::from([
-            ("a".into(), HostConfig { token: Some("aaa".into()), ..HostConfig::default() }),
-            ("b".into(), HostConfig { token: Some("bbb".into()), ..HostConfig::default() }),
+            (
+                "a".into(),
+                HostConfig {
+                    token: Some("aaa".into()),
+                    ..HostConfig::default()
+                },
+            ),
+            (
+                "b".into(),
+                HostConfig {
+                    token: Some("bbb".into()),
+                    ..HostConfig::default()
+                },
+            ),
         ]),
     };
     assert_eq!(cfg.host_for(None).unwrap().token.as_deref(), Some("aaa"));
-    assert_eq!(cfg.host_for(Some("b")).unwrap().token.as_deref(), Some("bbb"));
+    assert_eq!(
+        cfg.host_for(Some("b")).unwrap().token.as_deref(),
+        Some("bbb")
+    );
     assert!(cfg.host_for(Some("c")).is_none());
 }

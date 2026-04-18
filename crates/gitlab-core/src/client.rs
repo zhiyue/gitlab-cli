@@ -1,6 +1,6 @@
-use std::time::Duration;
 use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
+use std::time::Duration;
 use url::Url;
 
 use crate::error::{GitlabError, Result};
@@ -83,15 +83,25 @@ impl Client {
     }
 
     #[must_use]
-    pub fn base_url(&self) -> &Url { &self.base_url }
+    pub fn base_url(&self) -> &Url {
+        &self.base_url
+    }
     #[must_use]
-    pub fn token(&self) -> &str { &self.token }
+    pub fn token(&self) -> &str {
+        &self.token
+    }
     #[must_use]
-    pub fn http(&self) -> &reqwest::Client { &self.http }
+    pub fn http(&self) -> &reqwest::Client {
+        &self.http
+    }
     #[must_use]
-    pub fn retry(&self) -> &RetryPolicy { &self.retry }
+    pub fn retry(&self) -> &RetryPolicy {
+        &self.retry
+    }
     #[must_use]
-    pub fn throttle(&self) -> &Throttle { &self.throttle }
+    pub fn throttle(&self) -> &Throttle {
+        &self.throttle
+    }
 
     pub fn endpoint(&self, path: &str) -> Result<Url> {
         let trimmed = path.trim_start_matches('/');
@@ -115,7 +125,10 @@ impl Client {
                     q.append_pair(k, v);
                 }
             }
-            let mut req = self.http.request(spec.method.clone(), url).header("PRIVATE-TOKEN", &self.token);
+            let mut req = self
+                .http
+                .request(spec.method.clone(), url)
+                .header("PRIVATE-TOKEN", &self.token);
             if let Some(body) = &spec.body {
                 req = req.json(body);
             }
@@ -123,7 +136,10 @@ impl Client {
                 Ok(resp) => {
                     let status = resp.status().as_u16();
                     let headers = resp.headers().clone();
-                    let bytes = resp.bytes().await.map_err(|e| GitlabError::Network(e.to_string()))?;
+                    let bytes = resp
+                        .bytes()
+                        .await
+                        .map_err(|e| GitlabError::Network(e.to_string()))?;
                     match status {
                         200..=299 => return Ok((status, headers, bytes)),
                         429 => {
@@ -131,7 +147,10 @@ impl Client {
                                 .get("retry-after")
                                 .and_then(|h| h.to_str().ok())
                                 .map(|s| s.to_owned());
-                            if let Some(d) = self.retry.next_delay_for_429(retry_after.as_deref(), attempt_429) {
+                            if let Some(d) = self
+                                .retry
+                                .next_delay_for_429(retry_after.as_deref(), attempt_429)
+                            {
                                 attempt_429 += 1;
                                 if attempt_429 > self.retry.max_attempts_429 as usize {
                                     return Err(GitlabError::from_status(
@@ -161,11 +180,13 @@ impl Client {
                                 extract_request_id(&headers),
                             ));
                         }
-                        _ => return Err(GitlabError::from_status(
-                            status,
-                            String::from_utf8_lossy(&bytes).into_owned(),
-                            extract_request_id(&headers),
-                        )),
+                        _ => {
+                            return Err(GitlabError::from_status(
+                                status,
+                                String::from_utf8_lossy(&bytes).into_owned(),
+                                extract_request_id(&headers),
+                            ))
+                        }
                     }
                 }
                 Err(e) if e.is_timeout() => {
