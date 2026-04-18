@@ -92,6 +92,10 @@ These are server-side behaviors of GitLab 14.0.5-ee that surprise agents. CLI do
 
 Run `gitlab manifest` (and `gitlab manifest <command>`) for a JSON-formatted view of these quirks plus per-command examples — agents should consume that rather than this table.
 
+## Releasing
+
+See [RELEASING.md](RELEASING.md) for the validated end-to-end release SOP (~3 min, fully automated tag → brew).
+
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
