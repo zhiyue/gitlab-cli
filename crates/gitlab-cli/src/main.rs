@@ -99,6 +99,7 @@ enum Command {
     },
     #[command(name = "search")]
     Search(gitlab_cli::cmd::search::SearchArgs),
+    Manifest(gitlab_cli::cmd::manifest::ManifestArgs),
 }
 
 fn main() -> std::process::ExitCode {
@@ -106,6 +107,17 @@ fn main() -> std::process::ExitCode {
     tracing_setup::init(cli.globals.verbose.as_deref());
 
     let config_text = read_config_text(&cli.globals);
+
+    // Dispatch no-auth commands before Context::build (they don't need a token).
+    if let Command::Manifest(args) = cli.command {
+        return match gitlab_cli::cmd::manifest::run(args) {
+            Ok(()) => std::process::ExitCode::from(0),
+            Err(e) => {
+                eprintln!("{{\"error\":{{\"code\":\"invalid_args\",\"message\":\"{e}\",\"retryable\":false}}}}");
+                std::process::ExitCode::from(2)
+            }
+        };
+    }
 
     let result: Result<(), anyhow::Error> = match cli.command {
         Command::Config { cmd } => gitlab_cli::cmd::config::run(cmd, cli.globals.config.clone()),
@@ -146,6 +158,7 @@ fn main() -> std::process::ExitCode {
                     Command::Note { cmd } => gitlab_cli::cmd::note::run(ctx, cmd).await,
                     Command::Discussion { cmd } => gitlab_cli::cmd::discussion::run(ctx, cmd).await,
                     Command::Search(args) => gitlab_cli::cmd::search::run(ctx, args).await,
+                    Command::Manifest(_) => unreachable!("handled before Context::build"),
                 }
             })
         }

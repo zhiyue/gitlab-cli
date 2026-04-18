@@ -1,0 +1,184 @@
+# Static enrichment data for `gitlab manifest`.
+# Cross-cuts: clap reflection gives us command/verb names; this file gives
+# example invocations, return shapes, and known 14.0.5 quirks.
+
+instance_target = "GitLab 14.0.5-ee"
+
+agent_hints = [
+  "Set GITLAB_ASSUME_YES=1 (or assume_yes=true in config.toml [host]) to skip the 'type yes' prompt for write commands.",
+  "For details on a command, run: gitlab manifest <command> [<verb>]",
+  "Errors are emitted to stderr as JSON; check error.code (string vocabulary) and error.hint (when present).",
+  "Output is the unmodified GitLab 14.0.5 REST response — fields differ from 17.x.",
+  "Default --output is 'json' (single object or array); use 'ndjson' for line-delimited streaming.",
+]
+
+# One entry per top-level command. Keep purpose < 80 chars.
+[[command]]
+name = "version"
+purpose = "GitLab instance version + revision"
+
+[[command]]
+name = "me"
+purpose = "Current authenticated user (GET /user)"
+
+[[command]]
+name = "config"
+purpose = "Local config: set-token | list | path"
+
+[[command]]
+name = "api"
+purpose = "Raw HTTP escape hatch — METHOD + path + optional --data/--query"
+
+[[command]]
+name = "manifest"
+purpose = "Self-describing schema for agents (lazy 3-tier)"
+
+[[command]]
+name = "from-url"
+purpose = "Parse a GitLab web URL into structured JSON (project/iid/sha/path)"
+
+[[command]]
+name = "project"
+purpose = "Projects (list/get/create/update/delete/fork/archive/unarchive)"
+
+[[command]]
+name = "group"
+purpose = "Groups (list/get/members/projects/subgroups/create/update/delete)"
+
+[[command]]
+name = "mr"
+purpose = "Merge requests (list/get/create/update/close/reopen/merge/rebase/approve/unapprove/changes/commits/pipelines)"
+
+[[command]]
+name = "issue"
+purpose = "Issues (list/get/create/update/close/reopen/move/stats/link/unlink)"
+
+[[command]]
+name = "pipeline"
+purpose = "Pipelines (list/get/create/retry/cancel/delete/variables)"
+
+[[command]]
+name = "job"
+purpose = "Jobs (list/get/play/retry/cancel/erase/trace/artifacts) — trace/artifacts return raw bytes"
+
+[[command]]
+name = "commit"
+purpose = "Commits (list/get/create/diff/comments/statuses/cherry-pick/revert/refs)"
+
+[[command]]
+name = "branch"
+purpose = "Branches (list/get/create/delete/protect/unprotect)"
+
+[[command]]
+name = "tag"
+purpose = "Tags (list/get/create/delete/protect/unprotect)"
+
+[[command]]
+name = "file"
+purpose = "Repository files (get/raw/blame/create/update/delete) — accepts --ref branch|tag|sha"
+
+[[command]]
+name = "repo"
+purpose = "Repository ops (tree/archive/compare/contributors/merge-base)"
+
+[[command]]
+name = "user"
+purpose = "Users (list/get/me/keys/emails)"
+
+[[command]]
+name = "label"
+purpose = "Labels (list/get/create/update/delete/subscribe/unsubscribe)"
+
+[[command]]
+name = "note"
+purpose = "Comments on issue/mr/commit/snippet (list/get/create/update/delete)"
+
+[[command]]
+name = "discussion"
+purpose = "Discussion threads on issue/mr/commit (list/get/resolve/unresolve)"
+
+[[command]]
+name = "search"
+purpose = "Global / group / project search (--scope blobs|issues|... --query)"
+
+# Per-verb enrichment (only entries where example or quirk help).
+# Format: [[verb]] command="x" verb="y" example="..." quirk="..." returns="..."
+
+[[verb]]
+command = "mr"
+verb = "changes"
+example = "gitlab mr changes --project group/proj --mr 123"
+returns = "Single object with .changes[] containing {old_path, new_path, new_file, deleted_file, renamed_file, diff (unified)}"
+
+[[verb]]
+command = "mr"
+verb = "commits"
+example = "gitlab mr commits --project group/proj --mr 123"
+quirk = "parent_ids field is always [] in GitLab 14.0.5. To get parent SHAs, call: gitlab commit get --project <p> --sha <sha>"
+
+[[verb]]
+command = "mr"
+verb = "approve"
+quirk = "EE-only endpoint. May 403 on CE instances or if approver self-approval is blocked."
+
+[[verb]]
+command = "file"
+verb = "raw"
+example = "gitlab file raw --project g/p --path src/foo.rs --ref main  # also accepts tag or commit SHA"
+returns = "Raw bytes (no JSON wrapper) — pipe to file or stdout."
+
+[[verb]]
+command = "file"
+verb = "get"
+example = "gitlab file get --project g/p --path README.md --ref <sha>"
+returns = "JSON: {file_path, ref, blob_id, commit_id, last_commit_id, size, encoding='base64', content (base64-encoded)}"
+
+[[verb]]
+command = "job"
+verb = "trace"
+example = "gitlab job trace --project g/p --id 12345"
+returns = "Raw bytes (CI log, ANSI color codes preserved). Use plain bash redirect to capture."
+quirk = "If job is still running, returns partial trace. Poll until status is success|failed|canceled."
+
+[[verb]]
+command = "job"
+verb = "artifacts"
+returns = "Raw bytes (zip archive). 404 → exit 5 if no artifacts."
+
+[[verb]]
+command = "api"
+verb = "api"
+example = "gitlab api GET /projects/123/pipeline_schedules\ngitlab api POST /projects/123/issues --data '{\"title\":\"hi\"}'"
+quirk = "Use this for any 14.0.5 endpoint not wrapped by typed commands. Mutating verbs require --yes / GITLAB_ASSUME_YES."
+
+[[verb]]
+command = "search"
+verb = "search"
+example = "gitlab search --scope issues --query bug\ngitlab search --scope blobs --query 'fn main' --project g/p"
+returns = "JSON array of hits; shape varies per scope."
+
+# Cross-cutting known quirks (instance-level)
+[[quirk]]
+area = "mr diffs"
+issue = "GET /merge_requests/:iid/diffs returns 404 in 14.0.5 (introduced in 15.7)"
+workaround = "Use 'gitlab mr changes' which returns a single object with all file diffs."
+
+[[quirk]]
+area = "mr commits parent_ids"
+issue = "MR commits endpoint always returns parent_ids=[] in 14.0.5"
+workaround = "Use 'gitlab commit get --sha <sha>' to fetch full commit metadata including parent_ids."
+
+[[quirk]]
+area = "Project Access Tokens"
+issue = "Available in 14.0.5 but CLI only supports user-scoped PATs."
+workaround = "Use a user PAT, not a Project Access Token."
+
+[[quirk]]
+area = "Pagination"
+issue = "Default per_page is 20 (max 100). list commands auto-paginate by default."
+workaround = "Use --limit N to cap; use --no-paginate for first page only."
+
+[[quirk]]
+area = "Write confirmation"
+issue = "Write commands refuse to run without TTY confirmation by default."
+workaround = "Set GITLAB_ASSUME_YES=1 env var, or assume_yes=true under [host.\"...\"] in config.toml."
